@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Variant } from "../page";
+import { Variant } from "~/app/types";
 import requestApi from "~/utils/api";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useRouter } from "next/navigation";

@@ -1,7 +1,9 @@
 "use client";
 
+import { Box } from "@chakra-ui/react";
+
 const MessengerPage = () => {
-  return <div></div>;
+  return <Box>hihi</Box>;
 };
 
 export default MessengerPage;

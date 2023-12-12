@@ -3,10 +3,8 @@
 import {
   Box,
   Button,
-  Checkbox,
   HStack,
   Img,
-  Input,
   Link,
   Text,
   useColorMode,
@@ -16,11 +14,7 @@ import useUserInfo from "~/hooks/useUserInfo";
 import { commonStyles } from "~/styles/common";
 import AuthForm from "./components/AuthForm";
 import { useState } from "react";
-
-export enum Variant {
-  LOGIN = "LOGIN",
-  REGISTER = "REGISTER",
-}
+import { Variant } from "./types";
 
 export default function Home() {
   const [variant, setVariant] = useState<Variant>(Variant.LOGIN); // ["LOGIN", "REGISTER"

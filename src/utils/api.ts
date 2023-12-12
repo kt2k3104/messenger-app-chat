@@ -1,3 +1,5 @@
+"use client";
+
 import axios from "axios";
 
 // export const BASEURL = "https://thinhnguyen.live/api/v1";

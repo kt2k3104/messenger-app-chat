@@ -32,7 +32,7 @@ function Sidebar() {
       pusherClient.unsubscribe("6576bf7eab2daeb2de76e5c7");
       pusherClient.unbind("conversation:new");
     };
-  }, []);
+  }, [userId]);
 
   return (
     <VStack>
