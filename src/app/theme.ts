@@ -1,12 +1,29 @@
 /* theme.ts */
 import { extendTheme } from "@chakra-ui/react";
+import { mode } from "@chakra-ui/theme-tools";
 
 export const theme = extendTheme({
+  initialColorMode: "light",
+  useSystemColorMode: false,
   fonts: {
     heading: "var(--font-rubik)",
     body: "var(--font-rubik)",
   },
+  styles: {
+    // global: (props: any) => ({
+    //   body: {
+    //     color: mode("black", "#050505")(props),
+    //     bgColor: mode("#fff", "#242526")(props),
+    //   },
+    // }),
+  },
   colors: {
+    bgLight: {
+      100: "#FFFFFF",
+    },
+    bgDark: {
+      100: "#242526",
+    },
     primary: {
       100: "#0A7CFF",
       90: "rgba(10, 124, 255, 0.9)",

@@ -4,9 +4,12 @@
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
 
-import { Rubik } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { theme } from "./theme";
-const rubik = Rubik({ subsets: ["latin"] });
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: "300",
+});
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <style jsx global>
         {`
           :root {
-            --font-rubik: ${rubik.style.fontFamily};
+            --font-rubik: ${roboto.style.fontFamily};
           }
 
           html {
