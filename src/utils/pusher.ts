@@ -8,7 +8,7 @@ export const pusherClient = new PusherClient("7e50edbcfc264bcd43a1", {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       "x-client-id": localStorage.getItem("userId"),
     },
-    endpoint: "http://localhost:9900/api/v1/auth/pusher",
+    endpoint: `${process.env.NEXT_PUBLIC_API_URL}auth/pusher`,
     transport: "ajax",
   },
 });
