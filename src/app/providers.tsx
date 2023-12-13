@@ -23,6 +23,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
           html {
             font-size: 62.5%;
           }
+          body,
+          p {
+            font-size: 1.4rem;
+          }
         `}
       </style>
       <ChakraProvider theme={theme}>{children}</ChakraProvider>

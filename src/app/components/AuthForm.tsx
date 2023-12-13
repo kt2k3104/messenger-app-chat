@@ -123,7 +123,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
 
         setFriends(allUser);
 
-        router.push("/messenger");
+        router.push("/messenger/conversations");
       }
 
       reset();
@@ -135,7 +135,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   return (
     <Box m={"0 auto"} w={"318px"}>
       {variant === Variant.REGISTER && (
-        <Text fontSize={"20px"} textAlign={"center"}>
+        <Text fontSize={"24px"} textAlign={"center"}>
           Đăng ký
         </Text>
       )}
@@ -147,6 +147,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         {variant === Variant.REGISTER && (
           <>
             <Input
+              fontSize={"1.4rem"}
               h={"42px"}
               p={"0 16px"}
               mb={"12px"}
@@ -154,6 +155,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
               {...register("lastName", { pattern: /^[A-Za-z]+$/i })}
             />
             <Input
+              fontSize={"1.4rem"}
               h={"42px"}
               p={"0 16px"}
               mb={"12px"}
@@ -163,6 +165,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           </>
         )}
         <Input
+          fontSize={"1.4rem"}
           h={"42px"}
           p={"0 16px"}
           mb={"12px"}
@@ -177,6 +180,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           })}
         />
         <Input
+          fontSize={"1.4rem"}
           h={"42px"}
           p={"0 16px"}
           mb={"12px"}
@@ -192,6 +196,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         />
         {variant === Variant.REGISTER && (
           <Input
+            fontSize={"1.4rem"}
             h={"42px"}
             p={"0 16px"}
             mb={"12px"}
@@ -211,7 +216,13 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
             }}
           />
         )}
-        <Button type="submit" colorScheme="blue" display={"flex"} m={"0 auto"}>
+        <Button
+          fontSize={"1.4rem"}
+          type="submit"
+          colorScheme="blue"
+          display={"flex"}
+          m={"0 auto"}
+        >
           Tiếp tục
         </Button>
         {variant === Variant.LOGIN && (
