@@ -6,11 +6,11 @@ import {
   Input,
   Link,
   Text,
-  Toast,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, set, useForm } from "react-hook-form";
 import { Variant } from "~/app/types";
 import requestApi from "~/utils/api";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
@@ -34,6 +34,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const router = useRouter();
+  const toast = useToast();
 
   const setBasicUserInfo = useUserInfo(
     (state: UserInfoState) => state.setBasicUserInfo
@@ -64,31 +65,23 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         setVariant(Variant.LOGIN);
         setPassword("");
         setConfirmPassword("");
+        toast({
+          status: "success",
+          position: "top",
+          title: `Đăng ký thành công`,
+          duration: 3000,
+        });
+        setPassword("");
+        setConfirmPassword("");
+        reset();
       }
-      console.log(response);
-      reset();
-      Toast({
-        position: "top",
-        render: () => (
-          <Box
-            color="white"
-            p={5}
-            bg="#4c7cff"
-            borderRadius={"5px"}
-            mt={"30px"}
-          >
-            Đăng ký thành công!
-          </Box>
-        ),
-        duration: 1000,
-      });
     } catch (error) {
-      console.log(error);
-      // if (error.message.includes("ER_EMAIL_HAD_ACC")) {
-      //   setError("ER_EMAIL_HAD_ACC", {
-      //     type: "emaildatontai",
-      //   });
-      // }
+      toast({
+        status: "error",
+        position: "top",
+        title: `Email đã tồn tại`,
+        duration: 3000,
+      });
     }
   };
 
@@ -110,6 +103,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         localStorage.setItem("userId", responseData.metadata.userId);
 
         const { data: allUser } = await requestApi("users", "GET", null);
+        setFriends(allUser);
 
         const { data: usersData } = await requestApi("users/me", "GET", null);
         setBasicUserInfo({
@@ -121,14 +115,29 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           email: usersData.metadata.email,
         });
 
-        setFriends(allUser);
-
         router.push("/messenger/conversations");
       }
 
+      setPassword("");
       reset();
     } catch (error) {
       console.log(error);
+      if ((error as any).response.data.message === "Email is not registred.") {
+        toast({
+          status: "error",
+          position: "top",
+          title: `Tài khoản không tồn tại`,
+          duration: 3000,
+        });
+      }
+      if ((error as any).response.data.message === "Password is not correct") {
+        toast({
+          status: "error",
+          position: "top",
+          title: `Mật khẩu không đúng`,
+          duration: 3000,
+        });
+      }
     }
   };
 

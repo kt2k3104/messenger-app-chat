@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
-import { pusherClient } from "~/utils/pusher";
+import { initPusherClient } from "~/utils/pusher";
 
 function Sidebar() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -20,7 +20,11 @@ function Sidebar() {
   }, [userId]);
 
   useEffect(() => {
-    if (!pusherClient || !userId) return;
+    if (!initPusherClient || !userId) return;
+
+    const accessToken = localStorage.getItem("accessToken") || "";
+
+    const pusherClient = initPusherClient(accessToken, userId);
 
     pusherClient.subscribe("6576bf7eab2daeb2de76e5c7");
 
