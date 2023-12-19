@@ -1,6 +1,7 @@
 // "use client";
 import { create } from "zustand";
 import PusherClient from "pusher-js";
+import { NEXT_PUBLIC_API_URL } from "~/const";
 
 export interface PusherState {
   pusherClient: PusherClient | null;
@@ -17,7 +18,8 @@ const usePusher = create<PusherState>((set) => ({
           Authorization: `Bearer ${accessToken}`,
           "x-client-id": userId,
         },
-        endpoint: `${process.env.NEXT_PUBLIC_API_URL}auth/pusher`,
+        // endpoint: `${process.env.NEXT_PUBLIC_API_URL}auth/pusher`,
+        endpoint: `${NEXT_PUBLIC_API_URL}auth/pusher`,
         transport: "ajax",
       },
     });

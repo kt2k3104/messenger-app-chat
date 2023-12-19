@@ -1,5 +1,6 @@
 "use client";
 import PusherClient from "pusher-js";
+import { NEXT_PUBLIC_API_URL } from "~/const";
 
 export const initPusherClient = (accessToken: string, userId: string) => {
   return new PusherClient("7e50edbcfc264bcd43a1", {
@@ -9,7 +10,8 @@ export const initPusherClient = (accessToken: string, userId: string) => {
         Authorization: `Bearer ${accessToken}`,
         "x-client-id": userId,
       },
-      endpoint: `${process.env.NEXT_PUBLIC_API_URL}auth/pusher`,
+      // endpoint: `${process.env.NEXT_PUBLIC_API_URL}auth/pusher`,
+      endpoint: `${NEXT_PUBLIC_API_URL}auth/pusher`,
       transport: "ajax",
     },
   });
