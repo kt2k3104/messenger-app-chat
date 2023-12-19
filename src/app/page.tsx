@@ -8,21 +8,18 @@ import {
   Link,
   Text,
   useColorMode,
-  useColorModeValue,
 } from "@chakra-ui/react";
-import useUserInfo from "~/hooks/useUserInfo";
-import { commonStyles } from "~/styles/common";
 import AuthForm from "./components/AuthForm";
 import { useState } from "react";
 import { Variant } from "./types";
 
 export default function Home() {
-  const [variant, setVariant] = useState<Variant>(Variant.LOGIN); // ["LOGIN", "REGISTER"
-
+  const [variant, setVariant] = useState<Variant>(Variant.LOGIN);
   const { colorMode, toggleColorMode } = useColorMode();
 
   // const bg = useColorModeValue("#fff", "#242526");
   // const color = useColorModeValue("black", "#050505");
+
   return (
     <Box p={"24vh 0"}>
       <Button onClick={toggleColorMode}>doi mau</Button>

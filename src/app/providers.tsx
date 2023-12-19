@@ -7,8 +7,10 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Roboto } from "next/font/google";
 import { theme } from "./theme";
 const roboto = Roboto({
+  weight: ["100", "300", "400", "500", "700", "900"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
-  weight: "300",
+  display: "swap",
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {

@@ -13,6 +13,7 @@ import Link from "next/link";
 import CustomIcons from "../components/Icon";
 import { useState } from "react";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
 
 export default function RootLayout({
   children,
@@ -23,19 +24,25 @@ export default function RootLayout({
 
   const user = useUserInfo((state: UserInfoState) => state.basicUserInfo);
   const { colorMode, toggleColorMode } = useColorMode();
+  const currConversation = useConversations(
+    (state: ConversationsState) => state.currConversation
+  );
 
-  const bg = useColorModeValue("0000001a", "#ffffff1a");
+  const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
 
   return (
-    <HStack h="100vh">
+    <HStack h="100vh" position="relative">
       <VStack
-        w={expanded ? "248px" : "60px"}
+        w={expanded ? "249px" : "61px"}
         h="100vh"
         borderRight="1px solid "
         borderColor={bg}
         pt="12px"
       >
-        <Link href={"/messenger/conversations"} passHref={true}>
+        <Link
+          href={`/messenger/conversations/${currConversation?._id}`}
+          passHref={true}
+        >
           <Button
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
@@ -137,7 +144,9 @@ export default function RootLayout({
         </Box>
       </VStack>
       <Box flex="1">{children}</Box>
-      <Button onClick={toggleColorMode}>doi mau</Button>
+      <Button position="absolute" top="0" right="0" onClick={toggleColorMode}>
+        {colorMode}
+      </Button>
     </HStack>
   );
 }

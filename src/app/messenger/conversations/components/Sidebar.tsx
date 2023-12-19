@@ -1,54 +1,214 @@
 "use client";
-import { Box, VStack, keyframes } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  Img,
+  Input,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
-import requestApi from "~/utils/api";
-import { initPusherClient } from "~/utils/pusher";
+import { TfiMoreAlt } from "react-icons/tfi";
+
+import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import CustomIcons from "~/app/components/Icon";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
 
 function Sidebar() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const conversations = useConversations(
+    (state: ConversationsState) => state.conversations
+  );
+  const pushConversation = useConversations(
+    (state: ConversationsState) => state.pushConversation
+  );
   const userId = useUserInfo((state: UserInfoState) => state.basicUserInfo)
     ?._id;
+  const setCurrConversation = useConversations(
+    (state: ConversationsState) => state.setCurrConversation
+  );
+  const currConversation = useConversations(
+    (state: ConversationsState) => state.currConversation
+  );
 
-  useEffect(() => {
-    const getAllConversations = async () => {
-      const { data } = await requestApi("conversations", "GET", null);
-      setConversations(data.metadata);
-    };
-    getAllConversations();
-  }, [userId]);
+  const convertTime = (created_at: string) => {
+    const createdAtDate: Date = new Date(created_at);
+    const currentTime: Date = new Date();
+    const timeDifference = Number(currentTime) - Number(createdAtDate) + 4000;
+    const secondsDifference = Math.floor(timeDifference / 1000);
+    const minutesDifference = Math.floor(secondsDifference / 60);
+    const hoursDifference = Math.floor(minutesDifference / 60);
+    const daysDifference = Math.floor(hoursDifference / 24);
 
-  useEffect(() => {
-    if (!initPusherClient || !userId) return;
+    if (secondsDifference < 10) return "Vừa xong";
+    if (secondsDifference >= 10 && secondsDifference < 60)
+      return `${secondsDifference} giây`;
+    if (minutesDifference < 60) return `${minutesDifference} phút`;
+    if (hoursDifference < 24) return `${hoursDifference} giờ`;
+    if (daysDifference >= 1) return `${daysDifference} ngày`;
+  };
 
-    const accessToken = localStorage.getItem("accessToken") || "";
+  // const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
-    const pusherClient = initPusherClient(accessToken, userId);
+  // useEffect(() => {
+  //   // let pusherClient: PusherClient | null = null;
 
-    pusherClient.subscribe("6576bf7eab2daeb2de76e5c7");
+  //   // const accessToken = localStorage.getItem("accessToken") || "";
+  //   // if (accessToken && userId) {
+  //   //   pusherClient = initPusherClient(accessToken, userId);
+  //   // } else return;
 
-    pusherClient.bind("conversation:new", (data: any) => {
-      setConversations((conversations) => [...conversations, data]);
-    });
+  //   if (!pusherClient || !userId) return;
+  //   pusherClient.subscribe(userId);
 
-    return () => {
-      pusherClient.unsubscribe("6576bf7eab2daeb2de76e5c7");
-      pusherClient.unbind("conversation:new");
-    };
-  }, [userId]);
+  //   pusherClient.bind("conversation:new", (data: Conversation) => {
+  //     pushConversation(data);
+  //   });
+
+  //   return () => {
+  //     pusherClient?.unsubscribe(userId);
+  //     pusherClient?.unbind("conversation:new");
+  //   };
+  // }, [userId, pusherClient]);
 
   return (
-    <VStack>
+    <VStack p="0 6px">
+      <HStack
+        display={{ base: "none", lg: "flex" }}
+        w="100%"
+        h="49px"
+        justifyContent="space-between"
+      >
+        <Text
+          fontSize="24px"
+          fontWeight="700"
+          lineHeight="28px"
+          ml="18px"
+          mt="5px"
+        >
+          Đoạn chat
+        </Text>
+        <Button borderRadius="50%" w="36px" h="36px" mt="6px" mr="10px">
+          <CustomIcons.icon_add_conversation />
+        </Button>
+      </HStack>
+      <HStack
+        as="form"
+        w={{ base: "55px", lg: "320px" }}
+        h="36px"
+        m={{ base: "7px 16px 12px", lg: "0 16px 12px" }}
+        pl={{ base: "8px", lg: "15px" }}
+        justifyContent="center"
+        bgColor="bgLightActive.100"
+        borderRadius="999px"
+      >
+        <CustomIcons.icon_search />
+        <Input
+          w="290px"
+          bgColor="transparent"
+          outline="none"
+          border="none"
+          p="0px"
+          fontSize="1.4rem"
+          display={{ base: "none", lg: "inline" }}
+          _placeholder={{
+            fontWeight: 300,
+            fontSize: "1.5rem",
+          }}
+          placeholder="Tìm kiếm trên Messenger"
+        />
+        <Input
+          w="18px"
+          bgColor="transparent"
+          outline="none"
+          border="none"
+          p="0px"
+          fontSize="1.4rem"
+          display={{ base: "inline", lg: "none" }}
+          _placeholder={{
+            fontWeight: 300,
+            fontSize: "1.5rem",
+          }}
+          placeholder=""
+        />
+      </HStack>
       {conversations &&
         conversations?.map((conversation) => {
           return (
             <Link
+              style={{ width: "100%" }}
               href={`/messenger/conversations/${conversation._id}`}
               passHref
               key={conversation._id}
+              onClick={() => {
+                setCurrConversation(conversation);
+              }}
             >
-              {conversation.name}
+              <HStack
+                alignItems="center"
+                justifyContent="flex-start"
+                _hover={{
+                  bgColor: "bgLightActive.100",
+                }}
+                bgColor={
+                  conversation._id === currConversation?._id
+                    ? "bgLightActive.100"
+                    : "transparent"
+                }
+                p="10px"
+                mr="12px"
+                borderRadius="10px"
+                role="group"
+              >
+                <Img
+                  src={
+                    conversation.thumb
+                      ? conversation.thumb
+                      : "/images/no-image.png"
+                  }
+                  alt="avt"
+                  w="48px"
+                  h="48px"
+                  borderRadius="50%"
+                  mr="5px"
+                />
+                <VStack alignItems="center" gap="0">
+                  <Text fontWeight="500" mr="auto">
+                    {conversation.name}
+                  </Text>
+                  {conversation.messages.length > 0 && (
+                    <Text
+                      color="textSecond.100"
+                      fontWeight="300"
+                      fontSize="1.2rem"
+                      maxH="180px"
+                    >
+                      {conversation.messages[0].sender.firstName}:{" "}
+                      {conversation.messages[0].content} ·{" "}
+                      {convertTime(conversation.messages[0].createdAt)}
+                    </Text>
+                  )}
+                </VStack>
+                <Button
+                  w="32px"
+                  h="32px"
+                  borderRadius="50%"
+                  boxShadow="0 0 0 1px rgba(0,0,0,0.1)"
+                  ml="auto"
+                  alignItems="center"
+                  display="none"
+                  _groupHover={{
+                    display: "flex",
+                  }}
+                  fontSize="24px"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <TfiMoreAlt />
+                </Button>
+              </HStack>
             </Link>
           );
         })}

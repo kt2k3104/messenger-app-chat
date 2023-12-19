@@ -1,6 +1,5 @@
 /* theme.ts */
 import { extendTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
 
 export const theme = extendTheme({
   initialColorMode: "light",
@@ -20,6 +19,9 @@ export const theme = extendTheme({
   colors: {
     bgLight: {
       100: "#FFFFFF",
+    },
+    bgLightActive: {
+      100: "#868E991A",
     },
     bgDark: {
       100: "#242526",

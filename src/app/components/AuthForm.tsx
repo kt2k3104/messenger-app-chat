@@ -10,11 +10,12 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { SubmitHandler, set, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Variant } from "~/app/types";
 import requestApi from "~/utils/api";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useRouter } from "next/navigation";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
 
 type Inputs = {
   firstName: string;
@@ -30,6 +31,7 @@ interface AuthFormProps {
 }
 
 const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -40,6 +42,12 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
     (state: UserInfoState) => state.setBasicUserInfo
   );
   const setFriends = useUserInfo((state: UserInfoState) => state.setFriends);
+  const setConversation = useConversations(
+    (state: ConversationsState) => state.setConversations
+  );
+  const setCurrConversation = useConversations(
+    (state: ConversationsState) => state.setCurrConversation
+  );
 
   const {
     register,
@@ -51,6 +59,15 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   } = useForm<Inputs>();
 
   const handleResgister: SubmitHandler<Inputs> = async (data) => {
+    if (data.password !== data.confirm_password) {
+      toast({
+        status: "error",
+        position: "top",
+        title: `Mật khẩu không khớp`,
+        duration: 3000,
+      });
+      return;
+    }
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}auth/register`,
@@ -76,6 +93,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         reset();
       }
     } catch (error) {
+      console.log(error);
       toast({
         status: "error",
         position: "top",
@@ -115,11 +133,19 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           email: usersData.metadata.email,
         });
 
-        router.push("/messenger/conversations");
-      }
+        const { data: conversationsData } = await requestApi(
+          "conversations",
+          "GET",
+          null
+        );
+        setConversation(conversationsData.metadata);
+        conversationsData.metadata[0] &&
+          setCurrConversation(conversationsData.metadata[0]);
 
-      setPassword("");
-      reset();
+        router.push(
+          "/messenger/conversations/" + conversationsData.metadata[0]._id
+        );
+      }
     } catch (error) {
       console.log(error);
       if ((error as any).response.data.message === "Email is not registred.") {
@@ -161,7 +187,10 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
               p={"0 16px"}
               mb={"12px"}
               placeholder="Họ"
-              {...register("lastName", { pattern: /^[A-Za-z]+$/i })}
+              {...register("lastName", {
+                required: true,
+                pattern: /^[A-Za-z]+$/i,
+              })}
             />
             <Input
               fontSize={"1.4rem"}
@@ -180,6 +209,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           mb={"12px"}
           type="email"
           id="email"
+          value={email}
           placeholder={
             variant === Variant.LOGIN ? "Email hoặc số điện thoại" : "Email"
           }
@@ -187,6 +217,9 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
             required: true,
             pattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/i,
           })}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
         />
         <Input
           fontSize={"1.4rem"}
@@ -200,7 +233,6 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           {...register("password", { required: true, minLength: 6 })}
           onChange={(e) => {
             setPassword(e.target.value);
-            // if (errors.ER_PASS_IN_COR) clearErrors('ER_PASS_IN_COR');
           }}
         />
         {variant === Variant.REGISTER && (
@@ -216,12 +248,6 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
             {...register("confirm_password", { required: true, minLength: 6 })}
             onChange={(e) => {
               setConfirmPassword(e.target.value);
-              if (e.target.value !== password)
-                setError("confirm_password", {
-                  type: "manual",
-                  message: "Mật khẩu không khớp",
-                });
-              // if (errors.ER_PASS_IN_COR) clearErrors('ER_PASS_IN_COR');
             }}
           />
         )}
@@ -245,6 +271,9 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
             justifyContent={"flex-end"}
             mt={"10px"}
             onClick={() => {
+              setConfirmPassword("");
+              setEmail("");
+              setPassword("");
               setVariant(Variant.LOGIN);
             }}
           >
