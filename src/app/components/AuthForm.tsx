@@ -9,7 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, use, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Variant } from "~/app/types";
 import requestApi from "~/utils/api";
@@ -141,31 +141,34 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           null
         );
         setConversation(conversationsData.metadata);
-        conversationsData.metadata[0] &&
+        if (conversationsData.metadata[0]) {
           setCurrConversation(conversationsData.metadata[0]);
 
-        router.push(
-          "/messenger/conversations/" + conversationsData.metadata[0]._id
-        );
+          router.push(
+            "/messenger/conversations/" + conversationsData.metadata[0]._id
+          );
+        } else {
+          router.push("/messenger/conversations");
+        }
       }
     } catch (error) {
       console.log(error);
-      if ((error as any).response.data.message === "Email is not registred.") {
-        toast({
-          status: "error",
-          position: "top",
-          title: `Tài khoản không tồn tại`,
-          duration: 3000,
-        });
-      }
-      if ((error as any).response.data.message === "Password is not correct") {
-        toast({
-          status: "error",
-          position: "top",
-          title: `Mật khẩu không đúng`,
-          duration: 3000,
-        });
-      }
+      // if ((error as any).response.data.message === "Email is not registred.") {
+      //   toast({
+      //     status: "error",
+      //     position: "top",
+      //     title: `Tài khoản không tồn tại`,
+      //     duration: 3000,
+      //   });
+      // }
+      // if ((error as any).response.data.message === "Password is not correct") {
+      //   toast({
+      //     status: "error",
+      //     position: "top",
+      //     title: `Mật khẩu không đúng`,
+      //     duration: 3000,
+      //   });
+      // }
     }
   };
 

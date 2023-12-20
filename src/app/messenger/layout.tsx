@@ -40,7 +40,11 @@ export default function RootLayout({
         pt="12px"
       >
         <Link
-          href={`/messenger/conversations/${currConversation?._id}`}
+          href={
+            currConversation
+              ? `/messenger/conversations/${currConversation?._id}`
+              : "/messenger/conversations"
+          }
           passHref={true}
         >
           <Button

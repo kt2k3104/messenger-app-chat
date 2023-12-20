@@ -7,13 +7,17 @@ import {
   Input,
   Text,
   VStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { TfiMoreAlt } from "react-icons/tfi";
+import { IoMdClose } from "react-icons/io";
 
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import CustomIcons from "~/app/components/Icon";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function Sidebar() {
   const conversations = useConversations(
@@ -30,6 +34,10 @@ function Sidebar() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const [isShowBoxNewConversation, setIsShowBoxNewConversation] =
+    useState<Boolean>(false);
+  const router = useRouter();
+  const bgButton = useColorModeValue("#f5f5f5", "#ffffff1a");
 
   const convertTime = (created_at: string) => {
     const createdAtDate: Date = new Date(created_at);
@@ -88,7 +96,18 @@ function Sidebar() {
         >
           Đoạn chat
         </Text>
-        <Button borderRadius="50%" w="36px" h="36px" mt="6px" mr="10px">
+        <Button
+          borderRadius="50%"
+          w="36px"
+          h="36px"
+          mt="6px"
+          mr="10px"
+          bgColor={bgButton}
+          onClick={() => {
+            router.push("/messenger/conversations/new");
+            setIsShowBoxNewConversation(true);
+          }}
+        >
           <CustomIcons.icon_add_conversation />
         </Button>
       </HStack>
@@ -132,6 +151,60 @@ function Sidebar() {
           placeholder=""
         />
       </HStack>
+      {isShowBoxNewConversation && (
+        <HStack
+          alignItems="center"
+          justifyContent="flex-start"
+          _hover={{
+            bgColor: "bgLightActive.100",
+          }}
+          bgColor="bgLightActive.100"
+          p="10px"
+          mr="6px"
+          borderRadius="10px"
+          role="group"
+          w="100%"
+        >
+          <Img
+            src="/images/no-image.png"
+            alt="avt"
+            w="48px"
+            h="48px"
+            borderRadius="50%"
+            mr="5px"
+          />
+          <VStack alignItems="center" gap="0">
+            <Text fontWeight="500" mr="auto">
+              Tin nhắn mới
+            </Text>
+          </VStack>
+          <Button
+            w="24px"
+            h="24px"
+            borderRadius="50%"
+            boxShadow="0 0 0 1px rgba(0,0,0,0.1)"
+            ml="auto"
+            alignItems="center"
+            display="none"
+            _groupHover={{
+              display: "flex",
+            }}
+            fontSize="16px"
+            p="0"
+            bgColor="transparent"
+            onClick={(e) => {
+              setIsShowBoxNewConversation(false);
+              if (currConversation) {
+                router.push(
+                  `/messenger/conversations/${currConversation?._id}`
+                );
+              } else router.push("/messenger/conversations");
+            }}
+          >
+            <IoMdClose />
+          </Button>
+        </HStack>
+      )}
       {conversations &&
         conversations?.map((conversation) => {
           return (
@@ -156,7 +229,7 @@ function Sidebar() {
                     : "transparent"
                 }
                 p="10px"
-                mr="12px"
+                mr="6px"
                 borderRadius="10px"
                 role="group"
               >
@@ -212,6 +285,9 @@ function Sidebar() {
             </Link>
           );
         })}
+      {conversations?.length === 0 && !isShowBoxNewConversation && (
+        <Text>Không có cuộc trò chuyện nào</Text>
+      )}
     </VStack>
   );
 }

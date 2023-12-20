@@ -68,6 +68,9 @@ export default function RootLayout({
     initLogin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    document.title = "Messenger";
+  }, []);
   return (
     <html lang="en">
       <body>

@@ -21,7 +21,9 @@ export default function MessagesLayout({
       >
         <Sidebar />
       </Box>
-      <Box flex="1">{children}</Box>
+      <Box flex="1" mb="auto">
+        {children}
+      </Box>
     </HStack>
   );
 }
