@@ -30,6 +30,9 @@ function Sidebar() {
   const pushConversation = useConversations(
     (state: ConversationsState) => state.pushConversation
   );
+  const updateConversation = useConversations(
+    (state: ConversationsState) => state.updateConversations
+  );
   const userId = useUserInfo((state: UserInfoState) => state.basicUserInfo)
     ?._id;
   const setCurrConversation = useConversations(
@@ -74,10 +77,14 @@ function Sidebar() {
     pusherClient.bind("conversation:new", (data: Conversation) => {
       pushConversation(data);
     });
-
+    pusherClient.bind("conversation:update", (data: any) => {
+      console.log("DATA", data);
+      updateConversation(data);
+    });
     return () => {
       pusherClient?.unsubscribe(userId);
       pusherClient?.unbind("conversation:new");
+      pusherClient?.unbind("conversation:update");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, pusherClient]);
@@ -272,7 +279,11 @@ function Sidebar() {
                   mr="5px"
                 />
                 <VStack alignItems="center" gap="0">
-                  <Text fontWeight="500" mr="auto">
+                  <Text
+                    display={{ base: "none", lg: "inline" }}
+                    fontWeight="500"
+                    mr="auto"
+                  >
                     {conversation.isGroup
                       ? conversation.name
                       : conversation.members[0]._id === userId
@@ -281,14 +292,28 @@ function Sidebar() {
                   </Text>
                   {conversation.messages.length > 0 && (
                     <Text
+                      display={{ base: "none", lg: "inline" }}
                       color="textSecond.100"
                       fontWeight="300"
                       fontSize="1.2rem"
                       maxH="180px"
                     >
-                      {conversation.messages[0].sender.firstName}:{" "}
-                      {conversation.messages[0].content} ·{" "}
-                      {convertTime(conversation.messages[0].createdAt)}
+                      {conversation.messages[conversation.messages.length - 1]
+                        .sender._id === userId
+                        ? "Bạn: "
+                        : conversation.messages[
+                            conversation.messages.length - 1
+                          ].sender.firstName}
+                      :{" "}
+                      {
+                        conversation.messages[conversation.messages.length - 1]
+                          .content
+                      }{" "}
+                      ·{" "}
+                      {convertTime(
+                        conversation.messages[conversation.messages.length - 1]
+                          .createdAt
+                      )}
                     </Text>
                   )}
                 </VStack>
@@ -301,7 +326,7 @@ function Sidebar() {
                   alignItems="center"
                   display="none"
                   _groupHover={{
-                    display: "flex",
+                    display: { base: "none", lg: "flex" },
                   }}
                   fontSize="24px"
                   onClick={(e) => {

@@ -12,22 +12,39 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { IoMdClose } from "react-icons/io";
+import { IoIosClose } from "react-icons/io";
 
 import useLogic, { LogicState } from "~/hooks/useLogic";
+import { BasicUserInfo } from "~/hooks/useUserInfo";
 
 function New() {
   const [keyword, setKeyword] = useState<string>("");
   const [searchValue] = useDebounce(keyword, 500);
   const [searchResults, setSearchResults] = useState<any>(null);
   const bg = useColorModeValue("#fff", "#1b202b");
+  const bgbtn = useColorModeValue("#f5f5f5", "#ffffff1a");
 
   const waitingForAddedToGroup = useLogic(
     (state: LogicState) => state.waitingForAddedToGroup
   );
-  const setWaitingForAddedToGroup = useLogic(
-    (state: LogicState) => state.setWaitingForAddedToGroup
+  const pushWaitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.pushWaitingForAddedToGroup
   );
+  const popWaitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.popWaitingForAddedToGroup
+  );
+  // console.log(waitingForAddedToGroup);
+  // console.log(searchResults);
+
+  let showResults;
+  if (!waitingForAddedToGroup.length) {
+    showResults = searchResults;
+  }
+  waitingForAddedToGroup.forEach((user: BasicUserInfo) => {
+    showResults = searchResults?.filter(
+      (result: BasicUserInfo) => result._id !== user._id
+    );
+  });
 
   useEffect(() => {
     if (searchValue.trim()) {
@@ -35,7 +52,6 @@ function New() {
         const { data: result } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchValue}`
         );
-        console.log(result.metadata);
         setSearchResults(result.metadata);
       };
       handleSearchUsers();
@@ -52,13 +68,35 @@ function New() {
       position="relative"
     >
       <Text fontSize="1.5rem">Đến:</Text>
-      {waitingForAddedToGroup &&
-        waitingForAddedToGroup.map((user) => {
+      {waitingForAddedToGroup.length > 0 &&
+        waitingForAddedToGroup?.map((user) => {
           return (
-            <Button h="28px" p="0 8px" key={user._id}>
-              {user.displayName}
-              <IoMdClose />
-            </Button>
+            <HStack
+              borderRadius="5px"
+              bgColor={bgbtn}
+              h="28px"
+              p="0 8px"
+              key={user._id}
+              gap="5px"
+            >
+              <Text whiteSpace="nowrap" fontSize="1.2rem">
+                {user.displayName}
+              </Text>
+              <Button
+                p="0"
+                fontSize="14px"
+                minW="14px"
+                w="14px"
+                h="14px"
+                borderRadius="50%"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  popWaitingForAddedToGroup(user);
+                }}
+              >
+                <IoIosClose />
+              </Button>
+            </HStack>
           );
         })}
       <Input
@@ -81,32 +119,36 @@ function New() {
           bgColor={bg}
           p="6px"
         >
-          {searchResults?.map((user: any) => (
-            <Button
-              key={user._id}
-              p="8px"
-              borderBottom="1px solid"
-              borderColor="rgba(255,255,255,0.1)"
-              w="100%"
-              h="52px"
-              bgColor="transparent"
-              alignItems="center"
-              justifyContent="flex-start"
-              gap="10px"
-              onClick={() => {
-                setWaitingForAddedToGroup(user);
-              }}
-            >
-              <Img
-                src={user.avatar ? user.avatar : "/images/no-image.png"}
-                alt="avt"
-                w="36px"
-                h="36px"
-                borderRadius="50%"
-              />
-              <Text fontWeight="400">{user.displayName}</Text>
-            </Button>
-          ))}
+          {showResults?.map((user: any) => {
+            return (
+              <Button
+                key={user._id}
+                p="8px"
+                borderBottom="1px solid"
+                borderColor="rgba(255,255,255,0.1)"
+                w="100%"
+                h="52px"
+                bgColor="transparent"
+                alignItems="center"
+                justifyContent="flex-start"
+                gap="10px"
+                onClick={() => {
+                  pushWaitingForAddedToGroup(user);
+                  setKeyword("");
+                  setSearchResults(null);
+                }}
+              >
+                <Img
+                  src={user.avatar ? user.avatar : "/images/no-image.png"}
+                  alt="avt"
+                  w="36px"
+                  h="36px"
+                  borderRadius="50%"
+                />
+                <Text fontWeight="400">{user.displayName}</Text>
+              </Button>
+            );
+          })}
         </Box>
       )}
     </HStack>

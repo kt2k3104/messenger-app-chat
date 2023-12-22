@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, HStack, Input, Text, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Box, Button, HStack, Input, Text, VStack } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
 import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
@@ -10,6 +10,7 @@ import SidebarRight from "./SidebarRight";
 // import initPusherCLient from "~/utils/pusher";
 // import { pusherClient } from "~/utils/pusher";
 import usePusher, { PusherState } from "~/hooks/usePusher";
+import MessageBox from "./MessageBox";
 
 export interface IParams {
   conversationId: string;
@@ -19,8 +20,8 @@ const ConversationBody = ({ params }: { params: IParams }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const user = useUserInfo((state: UserInfoState) => state.basicUserInfo);
-
   const pusherClient = usePusher((state: PusherState) => state.pusherClient);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   const handleSubmitSendMessage = async (
     e: React.FormEvent<HTMLDivElement>
@@ -29,6 +30,7 @@ const ConversationBody = ({ params }: { params: IParams }) => {
     if (inputMessage === "") return;
 
     try {
+      setInputMessage("");
       const { data } = await requestApi("messages", "POST", {
         conversationId: params.conversationId,
         content: inputMessage,
@@ -48,8 +50,6 @@ const ConversationBody = ({ params }: { params: IParams }) => {
       //   }
       // );
 
-      setInputMessage("");
-
       console.log(data.metadata);
     } catch (error) {
       console.log(error);
@@ -63,7 +63,12 @@ const ConversationBody = ({ params }: { params: IParams }) => {
         "GET",
         null
       );
-      setMessages(messagesData.metadata);
+      setMessages(messagesData.metadata.reverse());
+      await requestApi(
+        `conversations/seen/${params.conversationId}`,
+        "POST",
+        {}
+      );
     };
     callApi();
   }, [params.conversationId]);
@@ -78,15 +83,35 @@ const ConversationBody = ({ params }: { params: IParams }) => {
     const channel = pusherClient.subscribe(params.conversationId);
 
     channel.bind("message:new", (data: Message) => {
-      console.log(data);
       setMessages((prev) => [...prev, data]);
+      requestApi(`conversations/seen/${params.conversationId}`, "POST", {});
+    });
+    channel.bind("message:update", (data: { updatedMessage: Message }) => {
+      setMessages((messages) => {
+        return messages.map((message: Message) => {
+          if (message._id === data.updatedMessage._id)
+            return data.updatedMessage;
+          else return message;
+        });
+      });
     });
 
     return () => {
       pusherClient?.unsubscribe(params.conversationId);
       channel?.unbind("message:new");
+      channel?.unbind("message:update");
     };
   }, [params.conversationId, pusherClient]);
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      buttonRef.current.scrollIntoView({
+        // behavior: "smooth",
+        // block: "nearest",
+        // inline: "start",
+      });
+    }
+  }, [messages]);
 
   // useEffect(() => {
   //   // let pusherClient: any = null;
@@ -119,21 +144,17 @@ const ConversationBody = ({ params }: { params: IParams }) => {
           w="100%"
           p="10px"
         >
-          {messages.map((message) => {
+          {messages.map((message, index) => {
             return (
               <HStack key={message._id} w="100%" h="30px">
-                {message.sender._id === user?._id ? (
-                  <Text ml="auto">
-                    {message.sender.firstName}: {message.content}
-                  </Text>
-                ) : (
-                  <Text mr="auto">
-                    {message.sender.firstName}: {message.content}
-                  </Text>
-                )}
+                <MessageBox
+                  message={message}
+                  isLastMessage={index === messages.length - 1 ? true : false}
+                />
               </HStack>
             );
           })}
+          <Box ref={buttonRef}></Box>
         </VStack>
         <HStack
           as="form"

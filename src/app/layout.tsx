@@ -7,6 +7,7 @@ import requestApi from "~/utils/api";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import { useRouter } from "next/navigation";
 import InitPusher from "./components/InitPusher";
+import ActiveStatus from "./messenger/conversations/components/ActiveStatus";
 
 export default function RootLayout({
   children,
@@ -72,6 +73,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <InitPusher />
+        <ActiveStatus />
         <Providers>{children}</Providers>
       </body>
     </html>
