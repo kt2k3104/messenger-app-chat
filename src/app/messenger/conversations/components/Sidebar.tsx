@@ -13,11 +13,15 @@ import Link from "next/link";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
 
-import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import CustomIcons from "~/app/components/Icon";
-import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
+// import initPusherCLient from "~/utils/pusher";
+// import { pusherClient } from "~/utils/pusher";
+import usePusher, { PusherState } from "~/hooks/usePusher";
 
 function Sidebar() {
   const conversations = useConversations(
@@ -34,6 +38,7 @@ function Sidebar() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
   const [isShowBoxNewConversation, setIsShowBoxNewConversation] =
     useState<Boolean>(false);
   const router = useRouter();
@@ -56,14 +61,32 @@ function Sidebar() {
     if (daysDifference >= 1) return `${daysDifference} ngày`;
   };
 
-  // const pusherClient = usePusher((state: PusherState) => state.pusherClient);
+  useEffect(() => {
+    // let pusherClient: any = null;
+    // const accessToken = localStorage.getItem("accessToken") || "";
+    // if (accessToken && userId) {
+    //   pusherClient = initPusherCLient(accessToken, userId);
+    // } else return;
+
+    if (!pusherClient || !userId) return;
+    pusherClient.subscribe(userId);
+
+    pusherClient.bind("conversation:new", (data: Conversation) => {
+      pushConversation(data);
+    });
+
+    return () => {
+      pusherClient?.unsubscribe(userId);
+      pusherClient?.unbind("conversation:new");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, pusherClient]);
 
   // useEffect(() => {
-  //   // let pusherClient: PusherClient | null = null;
-
+  //   // let pusherClient: any = null;
   //   // const accessToken = localStorage.getItem("accessToken") || "";
   //   // if (accessToken && userId) {
-  //   //   pusherClient = initPusherClient(accessToken, userId);
+  //   //   pusherClient = initPusherCLient(accessToken, userId);
   //   // } else return;
 
   //   if (!pusherClient || !userId) return;
@@ -215,6 +238,8 @@ function Sidebar() {
               key={conversation._id}
               onClick={() => {
                 setCurrConversation(conversation);
+                if (isShowBoxNewConversation)
+                  setIsShowBoxNewConversation(false);
               }}
             >
               <HStack
@@ -224,7 +249,8 @@ function Sidebar() {
                   bgColor: "bgLightActive.100",
                 }}
                 bgColor={
-                  conversation._id === currConversation?._id
+                  conversation._id === currConversation?._id &&
+                  !isShowBoxNewConversation
                     ? "bgLightActive.100"
                     : "transparent"
                 }
@@ -247,7 +273,11 @@ function Sidebar() {
                 />
                 <VStack alignItems="center" gap="0">
                   <Text fontWeight="500" mr="auto">
-                    {conversation.name}
+                    {conversation.isGroup
+                      ? conversation.name
+                      : conversation.members[0]._id === userId
+                      ? conversation.members[1].displayName
+                      : conversation.members[0].displayName}
                   </Text>
                   {conversation.messages.length > 0 && (
                     <Text

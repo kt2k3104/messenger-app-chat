@@ -7,8 +7,11 @@ import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
 import HeaderConversation from "./HeaderConversation";
 import SidebarRight from "./SidebarRight";
+// import initPusherCLient from "~/utils/pusher";
+// import { pusherClient } from "~/utils/pusher";
+import usePusher, { PusherState } from "~/hooks/usePusher";
 
-interface IParams {
+export interface IParams {
   conversationId: string;
 }
 
@@ -16,6 +19,8 @@ const ConversationBody = ({ params }: { params: IParams }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const user = useUserInfo((state: UserInfoState) => state.basicUserInfo);
+
+  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
   const handleSubmitSendMessage = async (
     e: React.FormEvent<HTMLDivElement>
@@ -28,6 +33,20 @@ const ConversationBody = ({ params }: { params: IParams }) => {
         conversationId: params.conversationId,
         content: inputMessage,
       });
+      // const { data } = await axios.post(
+      //   `${process.env.NEXT_PUBLIC_API_URL}messages`,
+      //   {
+      //     conversationId: params.conversationId,
+      //     content: inputMessage,
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      //       "x-client-id": `${user?._id}`,
+      //     },
+      //   }
+      // );
 
       setInputMessage("");
 
@@ -49,30 +68,45 @@ const ConversationBody = ({ params }: { params: IParams }) => {
     callApi();
   }, [params.conversationId]);
 
-  // useEffect(() => {
-  //   if (!currConversation) return;
+  useEffect(() => {
+    // let pusherClient: any = null;
+    // const accessToken = localStorage.getItem("accessToken") || "";
+    // if (accessToken && user?._id) {
+    //   pusherClient = initPusherCLient(accessToken, user._id);
+    // } else return;
+    if (!pusherClient || !params.conversationId) return;
+    const channel = pusherClient.subscribe(params.conversationId);
 
-  //   // let pusherClient: PusherClient | null = null;
+    channel.bind("message:new", (data: Message) => {
+      console.log(data);
+      setMessages((prev) => [...prev, data]);
+    });
+
+    return () => {
+      pusherClient?.unsubscribe(params.conversationId);
+      channel?.unbind("message:new");
+    };
+  }, [params.conversationId, pusherClient]);
+
+  // useEffect(() => {
+  //   // let pusherClient: any = null;
   //   // const accessToken = localStorage.getItem("accessToken") || "";
   //   // if (accessToken && user?._id) {
-  //   //   pusherClient = initPusherClient(accessToken, user?._id);
+  //   //   pusherClient = initPusherCLient(accessToken, user._id);
   //   // } else return;
-
-  //   console.log(pusherClient);
-
   //   if (!pusherClient || !params.conversationId) return;
-  //   pusherClient.subscribe(params.conversationId);
+  //   const channel = pusherClient.subscribe(params.conversationId);
 
-  //   pusherClient.bind("message:new", (data: Message) => {
+  //   channel.bind("message:new", (data: Message) => {
   //     console.log(data);
   //     setMessages((prev) => [...prev, data]);
   //   });
 
   //   return () => {
   //     pusherClient?.unsubscribe(params.conversationId);
-  //     pusherClient?.unbind("message:new");
+  //     channel?.unbind("message:new");
   //   };
-  // }, [params.conversationId, currConversation, pusherClient]);
+  // }, [params.conversationId, pusherClient]);
 
   return (
     <HStack h="100vh" w="100%" gap="0">

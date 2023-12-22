@@ -15,6 +15,7 @@ import { IoIosWarning } from "react-icons/io";
 
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import CustomIcons from "~/app/components/Icon";
+import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 
 export default function SidebarRight() {
   const isShowSidebarRight = useLogic(
@@ -26,7 +27,11 @@ export default function SidebarRight() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-  const [browserWidth, setBrowserWidth] = useState(window.innerWidth);
+  const userId = useUserInfo(
+    (state: UserInfoState) => state.basicUserInfo?._id
+  );
+  // const widthOfWindow = window?.innerWidth;
+  const [browserWidth, setBrowserWidth] = useState(0);
   const [isShowOption1, setIsShowOption1] = useState(false);
   const [isShowOption2, setIsShowOption2] = useState(false);
   const [isShowOption3, setIsShowOption3] = useState(false);
@@ -38,6 +43,7 @@ export default function SidebarRight() {
     setBrowserWidth(window.innerWidth);
   };
   useEffect(() => {
+    if (!window) return;
     window.addEventListener("resize", handleResize);
     setBrowserWidth(window.innerWidth);
     return () => {
@@ -80,7 +86,11 @@ export default function SidebarRight() {
         cursor="pointer"
         _hover={{ textDecoration: "underline" }}
       >
-        {currConversation?.name}
+        {currConversation?.isGroup
+          ? currConversation.name
+          : currConversation?.members[0]._id === userId
+          ? currConversation?.members[1].displayName
+          : currConversation?.members[0].displayName}
       </Text>
       <Button
         mt="20px"

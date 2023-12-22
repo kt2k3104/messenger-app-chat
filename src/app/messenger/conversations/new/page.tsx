@@ -12,18 +12,28 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { NEXT_PUBLIC_API_URL } from "~/const";
+import { IoMdClose } from "react-icons/io";
+
+import useLogic, { LogicState } from "~/hooks/useLogic";
 
 function New() {
   const [keyword, setKeyword] = useState<string>("");
   const [searchValue] = useDebounce(keyword, 500);
   const [searchResults, setSearchResults] = useState<any>(null);
   const bg = useColorModeValue("#fff", "#1b202b");
+
+  const waitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.waitingForAddedToGroup
+  );
+  const setWaitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.setWaitingForAddedToGroup
+  );
+
   useEffect(() => {
     if (searchValue.trim()) {
       const handleSearchUsers = async () => {
         const { data: result } = await axios.get(
-          `${NEXT_PUBLIC_API_URL}users/search?keyword=${searchValue}`
+          `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchValue}`
         );
         console.log(result.metadata);
         setSearchResults(result.metadata);
@@ -42,6 +52,15 @@ function New() {
       position="relative"
     >
       <Text fontSize="1.5rem">Đến:</Text>
+      {waitingForAddedToGroup &&
+        waitingForAddedToGroup.map((user) => {
+          return (
+            <Button h="28px" p="0 8px" key={user._id}>
+              {user.displayName}
+              <IoMdClose />
+            </Button>
+          );
+        })}
       <Input
         value={keyword}
         autoFocus
@@ -74,6 +93,9 @@ function New() {
               alignItems="center"
               justifyContent="flex-start"
               gap="10px"
+              onClick={() => {
+                setWaitingForAddedToGroup(user);
+              }}
             >
               <Img
                 src={user.avatar ? user.avatar : "/images/no-image.png"}

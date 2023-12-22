@@ -4,10 +4,14 @@ import { Button, HStack, Img, Text } from "@chakra-ui/react";
 import CustomIcons from "~/app/components/Icon";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
+import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 
 export default function HeaderConversation() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
+  );
+  const userId = useUserInfo(
+    (state: UserInfoState) => state.basicUserInfo?._id
   );
   const isShowSidebarRight = useLogic(
     (state: LogicState) => state.isShowSidebarRight
@@ -48,7 +52,11 @@ export default function HeaderConversation() {
           borderRadius="50%"
         />
         <Text fontWeight="500" ml="5px" fontSize="1.5rem">
-          {currConversation?.name}
+          {currConversation?.isGroup
+            ? currConversation.name
+            : currConversation?.members[0]._id === userId
+            ? currConversation?.members[1].displayName
+            : currConversation?.members[0].displayName}
         </Text>
       </Button>
       <HStack mr="10px" gap="8px">

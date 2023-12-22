@@ -21,7 +21,7 @@ export default function Home() {
   // const color = useColorModeValue("black", "#050505");
 
   return (
-    <Box p={"24vh 0"}>
+    <Box p={"24vh 0"} h="100vh" overflow="hidden">
       <Button onClick={toggleColorMode}>doi mau</Button>
       <Box display={"flex"} justifyContent={"center"}>
         <Img

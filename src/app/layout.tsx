@@ -6,7 +6,7 @@ import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import { useRouter } from "next/navigation";
-import usePusher, { PusherState } from "~/hooks/usePusher";
+import InitPusher from "./components/InitPusher";
 
 export default function RootLayout({
   children,
@@ -23,9 +23,7 @@ export default function RootLayout({
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
-  const setPusherClient = usePusher(
-    (state: PusherState) => state.setPusherClient
-  );
+
   const router = useRouter();
 
   useEffect(() => {
@@ -34,7 +32,6 @@ export default function RootLayout({
         const access_token = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId");
         if (access_token && userId) {
-          setPusherClient(access_token, userId);
           const { data: allUser } = await requestApi("users", "GET", null);
           setFriends(allUser);
 
@@ -74,6 +71,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <InitPusher />
         <Providers>{children}</Providers>
       </body>
     </html>
