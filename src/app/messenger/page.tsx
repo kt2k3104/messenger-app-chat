@@ -6,6 +6,6 @@ const Messenger = () => {
   const basicUserInfo = useUserInfo((state) => state.basicUserInfo);
   const friends = useUserInfo((state) => state.friends);
 
-  return <div>Messenger</div>;
+  return <div></div>;
 };
 export default Messenger;

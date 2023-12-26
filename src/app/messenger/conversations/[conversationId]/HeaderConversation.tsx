@@ -4,7 +4,8 @@ import { Button, HStack, Img, Text } from "@chakra-ui/react";
 import CustomIcons from "~/app/components/Icon";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
+import ThumbConversation from "../components/ThumbConversation";
 
 export default function HeaderConversation() {
   const currConversation = useConversations(
@@ -40,17 +41,9 @@ export default function HeaderConversation() {
         }}
         bgColor="transparent"
       >
-        <Img
-          src={
-            currConversation?.thumb
-              ? currConversation.thumb
-              : "/images/no-image.png"
-          }
-          alt="avt"
-          w="36px"
-          h="36px"
-          borderRadius="50%"
-        />
+        {currConversation && (
+          <ThumbConversation conversation={currConversation} size="sm" />
+        )}
         <Text fontWeight="500" ml="5px" fontSize="1.5rem">
           {currConversation?.isGroup
             ? currConversation.name

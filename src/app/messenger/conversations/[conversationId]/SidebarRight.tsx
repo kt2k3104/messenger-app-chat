@@ -16,6 +16,7 @@ import { IoIosWarning } from "react-icons/io";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import ThumbConversation from "../components/ThumbConversation";
 
 export default function SidebarRight() {
   const isShowSidebarRight = useLogic(
@@ -65,21 +66,13 @@ export default function SidebarRight() {
       borderLeft="1px solid"
       borderColor={bg}
       gap="0"
+      p="16px 0 0 0"
     >
-      <Img
-        src={
-          currConversation?.thumb
-            ? currConversation.thumb
-            : "/images/no-image.png"
-        }
-        alt="avt"
-        w="80px"
-        h="80px"
-        borderRadius="50%"
-        mt="16px"
-        mb="6px"
-      />
+      {currConversation && (
+        <ThumbConversation conversation={currConversation} size="lg" />
+      )}
       <Text
+        mt="6px"
         as="a"
         fontSize="1.6rem"
         fontWeight="500"

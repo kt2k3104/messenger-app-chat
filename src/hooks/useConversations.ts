@@ -4,7 +4,7 @@ import { Conversation } from "./useUserInfo";
 export interface ConversationsState {
   conversations: Conversation[];
   currConversation: Conversation | null;
-  setCurrConversation: (conversation: Conversation) => void;
+  setCurrConversation: (conversation: Conversation | null) => void;
   setConversations: (conversations: Conversation[]) => void;
   updateConversations: (conversations: Conversation[]) => void;
   pushConversation: (conversation: Conversation) => void;
@@ -13,7 +13,7 @@ export interface ConversationsState {
 const useConversations = create<ConversationsState>((set) => ({
   conversations: [],
   currConversation: null,
-  setCurrConversation: (conversation: Conversation) =>
+  setCurrConversation: (conversation: Conversation | null) =>
     set({ currConversation: conversation }),
   setConversations: (conversations: Conversation[]) =>
     set({ conversations: conversations }),

@@ -15,13 +15,14 @@ import { IoMdClose } from "react-icons/io";
 
 import CustomIcons from "~/app/components/Icon";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
-// import initPusherCLient from "~/utils/pusher";
-// import { pusherClient } from "~/utils/pusher";
 import usePusher, { PusherState } from "~/hooks/usePusher";
+import useLogic, { LogicState } from "~/hooks/useLogic";
+import ThumbConversation from "./ThumbConversation";
+import { set } from "react-hook-form";
 
 function Sidebar() {
   const conversations = useConversations(
@@ -41,9 +42,21 @@ function Sidebar() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const waitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.waitingForAddedToGroup
+  );
+  const isShowBoxNewConversation = useLogic(
+    (state: LogicState) => state.isShowBoxNewConversation
+  );
+  const setIsShowBoxNewConversation = useLogic(
+    (state: LogicState) => state.setIsShowBoxNewConversation
+  );
+  const setWaitingForAddedToGroup = useLogic(
+    (state: LogicState) => state.setWaitingForAddedToGroup
+  );
+
   const pusherClient = usePusher((state: PusherState) => state.pusherClient);
-  const [isShowBoxNewConversation, setIsShowBoxNewConversation] =
-    useState<Boolean>(false);
+
   const router = useRouter();
   const bgButton = useColorModeValue("#f5f5f5", "#ffffff1a");
 
@@ -65,12 +78,6 @@ function Sidebar() {
   };
 
   useEffect(() => {
-    // let pusherClient: any = null;
-    // const accessToken = localStorage.getItem("accessToken") || "";
-    // if (accessToken && userId) {
-    //   pusherClient = initPusherCLient(accessToken, userId);
-    // } else return;
-
     if (!pusherClient || !userId) return;
     pusherClient.subscribe(userId);
 
@@ -88,26 +95,6 @@ function Sidebar() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, pusherClient]);
-
-  // useEffect(() => {
-  //   // let pusherClient: any = null;
-  //   // const accessToken = localStorage.getItem("accessToken") || "";
-  //   // if (accessToken && userId) {
-  //   //   pusherClient = initPusherCLient(accessToken, userId);
-  //   // } else return;
-
-  //   if (!pusherClient || !userId) return;
-  //   pusherClient.subscribe(userId);
-
-  //   pusherClient.bind("conversation:new", (data: Conversation) => {
-  //     pushConversation(data);
-  //   });
-
-  //   return () => {
-  //     pusherClient?.unsubscribe(userId);
-  //     pusherClient?.unbind("conversation:new");
-  //   };
-  // }, [userId, pusherClient]);
 
   return (
     <VStack p="0 6px">
@@ -136,6 +123,7 @@ function Sidebar() {
           onClick={() => {
             router.push("/messenger/conversations/new");
             setIsShowBoxNewConversation(true);
+            setCurrConversation(null);
           }}
         >
           <CustomIcons.icon_add_conversation />
@@ -188,26 +176,84 @@ function Sidebar() {
           _hover={{
             bgColor: "bgLightActive.100",
           }}
-          bgColor="bgLightActive.100"
+          bgColor={!currConversation ? "bgLightActive.100" : "transparent"}
           p="10px"
           mr="6px"
           borderRadius="10px"
           role="group"
           w="100%"
+          cursor="pointer"
+          onClick={() => {
+            router.push("/messenger/conversations/new");
+            setCurrConversation(null);
+          }}
         >
-          <Img
-            src="/images/no-image.png"
-            alt="avt"
-            w="48px"
-            h="48px"
-            borderRadius="50%"
-            mr="5px"
-          />
-          <VStack alignItems="center" gap="0">
-            <Text fontWeight="500" mr="auto">
-              Tin nhắn mới
-            </Text>
-          </VStack>
+          {waitingForAddedToGroup.length < 2 && (
+            <Img
+              src={
+                waitingForAddedToGroup[0]?.avatar
+                  ? waitingForAddedToGroup[0]?.avatar
+                  : "/images/no-image.png"
+              }
+              alt="avt"
+              w="48px"
+              h="48px"
+              borderRadius="50%"
+              mr="5px"
+            />
+          )}
+          {waitingForAddedToGroup.length > 1 && (
+            <Box w="48px" h="48px" mr="5px" position="relative">
+              <Img
+                src={
+                  waitingForAddedToGroup[0].avatar
+                    ? waitingForAddedToGroup[0].avatar
+                    : "/images/no-image.png"
+                }
+                alt="avt"
+                w="32px"
+                h="32px"
+                borderRadius="50%"
+                position="absolute"
+                bottom="0"
+                left="0"
+              />
+              <Img
+                src={
+                  waitingForAddedToGroup[1].avatar
+                    ? waitingForAddedToGroup[1].avatar
+                    : "/images/no-image.png"
+                }
+                alt="avt"
+                w="32px"
+                h="32px"
+                borderRadius="50%"
+                position="absolute"
+                top="0"
+                right="0"
+                zIndex="0"
+              />
+            </Box>
+          )}
+          <Text
+            fontWeight="500"
+            mr="auto"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            flex="1"
+          >
+            Tin nhắn mới{" "}
+            {waitingForAddedToGroup.length > 0 &&
+              `đến ${waitingForAddedToGroup[0].displayName}`}
+            {waitingForAddedToGroup.length > 1 &&
+              waitingForAddedToGroup.map((user, index) => {
+                if (index === 0) return;
+                if (index === 1 && waitingForAddedToGroup.length === 2)
+                  return ` và ${user.displayName}`;
+                return `, ${user.displayName}`;
+              })}
+          </Text>
           <Button
             w="24px"
             h="24px"
@@ -223,12 +269,17 @@ function Sidebar() {
             p="0"
             bgColor="transparent"
             onClick={(e) => {
+              e.stopPropagation();
+              setWaitingForAddedToGroup([]);
               setIsShowBoxNewConversation(false);
               if (currConversation) {
+                router.push(`/messenger/conversations/${currConversation._id}`);
+              } else {
+                setCurrConversation(conversations[0]);
                 router.push(
-                  `/messenger/conversations/${currConversation?._id}`
+                  `/messenger/conversations/${conversations[0]?._id}`
                 );
-              } else router.push("/messenger/conversations");
+              }
             }}
           >
             <IoMdClose />
@@ -245,7 +296,10 @@ function Sidebar() {
               key={conversation._id}
               onClick={() => {
                 setCurrConversation(conversation);
-                if (isShowBoxNewConversation)
+                if (
+                  isShowBoxNewConversation &&
+                  waitingForAddedToGroup.length === 0
+                )
                   setIsShowBoxNewConversation(false);
               }}
             >
@@ -256,8 +310,7 @@ function Sidebar() {
                   bgColor: "bgLightActive.100",
                 }}
                 bgColor={
-                  conversation._id === currConversation?._id &&
-                  !isShowBoxNewConversation
+                  conversation._id === currConversation?._id
                     ? "bgLightActive.100"
                     : "transparent"
                 }
@@ -266,18 +319,7 @@ function Sidebar() {
                 borderRadius="10px"
                 role="group"
               >
-                <Img
-                  src={
-                    conversation.thumb
-                      ? conversation.thumb
-                      : "/images/no-image.png"
-                  }
-                  alt="avt"
-                  w="48px"
-                  h="48px"
-                  borderRadius="50%"
-                  mr="5px"
-                />
+                <ThumbConversation conversation={conversation} size="md" />
                 <VStack alignItems="center" gap="0">
                   <Text
                     display={{ base: "none", lg: "inline" }}
@@ -287,7 +329,7 @@ function Sidebar() {
                     {conversation.isGroup
                       ? conversation.name
                       : conversation.members[0]._id === userId
-                      ? conversation.members[1].displayName
+                      ? conversation.members[1]?.displayName
                       : conversation.members[0].displayName}
                   </Text>
                   {conversation.messages.length > 0 && (
@@ -297,6 +339,7 @@ function Sidebar() {
                       fontWeight="300"
                       fontSize="1.2rem"
                       maxH="180px"
+                      mr="auto"
                     >
                       {conversation.messages[conversation.messages.length - 1]
                         .sender._id === userId

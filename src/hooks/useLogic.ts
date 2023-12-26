@@ -4,6 +4,8 @@ import { BasicUserInfo } from "./useUserInfo";
 export interface LogicState {
   isShowSidebarRight: boolean;
   setIsShowSidebarRight: (isShowSidebarRight: boolean) => void;
+  isShowBoxNewConversation: boolean;
+  setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) => void;
   waitingForAddedToGroup: BasicUserInfo[];
   setWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo[]) => void;
   pushWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo) => void;
@@ -15,6 +17,9 @@ const useLogic = create<LogicState>((set) => ({
   setIsShowSidebarRight: (isShowSidebarRight: boolean) =>
     set({ isShowSidebarRight }),
   waitingForAddedToGroup: [],
+  isShowBoxNewConversation: false,
+  setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) =>
+    set({ isShowBoxNewConversation }),
   setWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo[]) =>
     set({ waitingForAddedToGroup }),
   pushWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo) =>
