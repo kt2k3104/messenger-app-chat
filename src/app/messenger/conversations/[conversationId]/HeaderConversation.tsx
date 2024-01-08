@@ -11,9 +11,7 @@ export default function HeaderConversation() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-  const userId = useUserInfo(
-    (state: UserInfoState) => state.basicUserInfo?._id
-  );
+  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   const isShowSidebarRight = useLogic(
     (state: LogicState) => state.isShowSidebarRight
   );

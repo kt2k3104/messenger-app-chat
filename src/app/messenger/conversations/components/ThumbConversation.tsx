@@ -13,20 +13,18 @@ function ThumbConversation({
   conversation: Conversation;
   size: ISizeThumb["size"];
 }) {
-  const userId = useUserInfo(
-    (state: UserInfoState) => state.basicUserInfo?._id
-  );
+  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   return (
     <>
-      {conversation.members.filter((user) => {
+      {conversation?.members?.filter((user) => {
         return user._id !== userId;
       }).length < 2 && (
         <Img
           src={
-            conversation.members.filter((user) => {
+            conversation?.members?.filter((user) => {
               return user._id !== userId;
             })[0]?.avatar
-              ? conversation.members.filter((user) => {
+              ? conversation?.members?.filter((user) => {
                   return user._id !== userId;
                 })[0]?.avatar
               : "/images/no-image.png"
@@ -38,7 +36,7 @@ function ThumbConversation({
           mr="5px"
         />
       )}
-      {conversation.members.filter((user) => {
+      {conversation?.members?.filter((user) => {
         return user._id !== userId;
       }).length > 1 &&
         conversation.thumb && (
@@ -51,7 +49,7 @@ function ThumbConversation({
             mr="5px"
           />
         )}
-      {conversation.members.filter((user) => {
+      {conversation?.members?.filter((user) => {
         return user._id !== userId;
       }).length > 1 &&
         !conversation.thumb && (
@@ -63,10 +61,10 @@ function ThumbConversation({
           >
             <Img
               src={
-                conversation.members.filter((user) => {
+                conversation?.members?.filter((user) => {
                   return user._id !== userId;
                 })[0].avatar
-                  ? conversation.members.filter((user) => {
+                  ? conversation?.members?.filter((user) => {
                       return user._id !== userId;
                     })[0].avatar
                   : "/images/no-image.png"
@@ -81,10 +79,10 @@ function ThumbConversation({
             />
             <Img
               src={
-                conversation.members.filter((user) => {
+                conversation?.members?.filter((user) => {
                   return user._id !== userId;
                 })[1].avatar
-                  ? conversation.members.filter((user) => {
+                  ? conversation?.members?.filter((user) => {
                       return user._id !== userId;
                     })[1].avatar
                   : "/images/no-image.png"

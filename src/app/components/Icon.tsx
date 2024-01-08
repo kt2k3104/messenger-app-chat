@@ -278,8 +278,8 @@ function IconTopic() {
     >
       <defs>
         <linearGradient gradientTransform="rotate(90)" id=":rtq:">
-          <stop offset="0%" stop-color="#0a7cff"></stop>
-          <stop offset="100%" stop-color="#0a7cff"></stop>
+          <stop offset="0%" stopColor="#0a7cff"></stop>
+          <stop offset="100%" stopColor="#0a7cff"></stop>
         </linearGradient>
       </defs>
       <defs>
@@ -420,6 +420,77 @@ function IconBlock() {
     </svg>
   );
 }
+function IconSendImage() {
+  return (
+    <svg
+      className="x1lliihq x1rdy4ex xcud41i x4vbgl9 x139jcc6 xsrhx6k"
+      height="28px"
+      viewBox="0 0 36 36"
+      width="28px"
+    >
+      <path d="M13.5 16.5a2 2 0 100-4 2 2 0 000 4z" fill="#0a7cff"></path>
+      <path
+        clipRule="evenodd"
+        d="M7 12v12a4 4 0 004 4h14a4 4 0 004-4V12a4 4 0 00-4-4H11a4 4 0 00-4 4zm18-1.5H11A1.5 1.5 0 009.5 12v9.546a.25.25 0 00.375.217L15 18.803a6 6 0 016 0l5.125 2.96a.25.25 0 00.375-.217V12a1.5 1.5 0 00-1.5-1.5z"
+        fill="#0a7cff"
+        fillRule="evenodd"
+      ></path>
+    </svg>
+  );
+}
+function IconAddImage() {
+  return (
+    <i
+      data-visualcompletion="css-img"
+      className="x1b0d499 xep6ejk"
+      style={{
+        backgroundImage: `url("https://static.xx.fbcdn.net/rsrc.php/v3/yf/r/5-ETpamKGnz.png?_nc_eui2=AeFsID5BEehGOpvLNcKc6tklSFzIAIVT4W9IXMgAhVPhbzcQDfQh26AhLG_5iMSgrgGFDlSc49xySwYs3xzBiB2F") `,
+        backgroundPosition: "-188px -546px ",
+        backgroundSize: "248px 668px ",
+        width: "24px",
+        height: "24px ",
+        backgroundRepeat: "no-repeat ",
+        display: "inline-block",
+      }}
+    ></i>
+  );
+}
+function IconFriendRequest() {
+  return (
+    <i
+      data-visualcompletion="css-img"
+      className="x1b0d499 xep6ejk"
+      style={{
+        backgroundImage: `url("https://static.xx.fbcdn.net/rsrc.php/v3/yK/r/HtzE2xBg9T-.png?_nc_eui2=AeG1Y62tqfddl2iBUnLhNrz5pPn7sVUJg9ek-fuxVQmD14mW0rW7IxeZyN16jHyykOcMhYbbuDj0WPcPRyEw1nNX")`,
+        backgroundPosition: "0px -166px",
+        backgroundSize: "34px 398px",
+        width: "20px",
+        height: " 20px",
+        backgroundRepeat: "no-repeat",
+        display: "inline-block",
+      }}
+    ></i>
+  );
+}
+function IconPinnedMessage() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq"
+      overflow="visible"
+      style={{ color: "var(--icon-primary-color)" }}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M21.39 21.997a.5.5 0 0 0-.485.38l-1.663 6.65c-.322 1.292-2.162 1.291-2.484 0l-1.663-6.65a.5.5 0 0 0-.485-.38h-4.442c-.95 0-1.478-1.064-.972-1.816.419-.62 1.533-2.029 3.589-3.04a.982.982 0 0 0 .536-.811c.099-1.284.334-3.339.435-4.661a.988.988 0 0 0-.465-.918 7.136 7.136 0 0 1-2.075-1.914C10.674 8.07 11.212 7 12.163 7h11.675c.95 0 1.488 1.07.946 1.837-.31.44-.97 1.232-2.075 1.914a.99.99 0 0 0-.465.918c.102 1.322.337 3.377.435 4.661a.982.982 0 0 0 .537.812c2.055 1.01 3.17 2.419 3.588 3.04.506.751-.021 1.816-.971 1.816H21.39z"
+      ></path>
+    </svg>
+  );
+}
 
 const CustomIcons = {
   icon_chat: IconChat,
@@ -445,5 +516,9 @@ const CustomIcons = {
   icon_temporary_message: IconTemporaryMessage,
   icon_limt: IconLimt,
   icon_block: IconBlock,
+  icon_send_image: IconSendImage,
+  icon_add_image: IconAddImage,
+  icon_friend_request: IconFriendRequest,
+  icon_pinned_message: IconPinnedMessage,
 };
 export default CustomIcons;

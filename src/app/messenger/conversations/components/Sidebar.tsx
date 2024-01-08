@@ -9,23 +9,21 @@ import {
   VStack,
   useColorModeValue,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { TfiMoreAlt } from "react-icons/tfi";
 import { IoMdClose } from "react-icons/io";
 
 import CustomIcons from "~/app/components/Icon";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import _ from "lodash";
 
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
 import usePusher, { PusherState } from "~/hooks/usePusher";
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import ThumbConversation from "./ThumbConversation";
-import { set } from "react-hook-form";
+import ConversationBox from "./ConversationBox";
 
 function Sidebar() {
-  const conversations = useConversations(
+  let conversations = useConversations(
     (state: ConversationsState) => state.conversations
   );
   const pushConversation = useConversations(
@@ -34,13 +32,15 @@ function Sidebar() {
   const updateConversation = useConversations(
     (state: ConversationsState) => state.updateConversations
   );
-  const userId = useUserInfo((state: UserInfoState) => state.basicUserInfo)
-    ?._id;
+  const userId = useUserInfo((state: UserInfoState) => state.userInfo)?._id;
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
+  );
+  const updateCurrConversation = useConversations(
+    (state: ConversationsState) => state.updateCurrConversation
   );
   const waitingForAddedToGroup = useLogic(
     (state: LogicState) => state.waitingForAddedToGroup
@@ -55,27 +55,13 @@ function Sidebar() {
     (state: LogicState) => state.setWaitingForAddedToGroup
   );
 
+  if (conversations)
+    conversations = _.orderBy(conversations, ["lastMessageAt"], ["desc"]);
+
   const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
   const router = useRouter();
   const bgButton = useColorModeValue("#f5f5f5", "#ffffff1a");
-
-  const convertTime = (created_at: string) => {
-    const createdAtDate: Date = new Date(created_at);
-    const currentTime: Date = new Date();
-    const timeDifference = Number(currentTime) - Number(createdAtDate) + 4000;
-    const secondsDifference = Math.floor(timeDifference / 1000);
-    const minutesDifference = Math.floor(secondsDifference / 60);
-    const hoursDifference = Math.floor(minutesDifference / 60);
-    const daysDifference = Math.floor(hoursDifference / 24);
-
-    if (secondsDifference < 10) return "Vừa xong";
-    if (secondsDifference >= 10 && secondsDifference < 60)
-      return `${secondsDifference} giây`;
-    if (minutesDifference < 60) return `${minutesDifference} phút`;
-    if (hoursDifference < 24) return `${hoursDifference} giờ`;
-    if (daysDifference >= 1) return `${daysDifference} ngày`;
-  };
 
   useEffect(() => {
     if (!pusherClient || !userId) return;
@@ -85,8 +71,9 @@ function Sidebar() {
       pushConversation(data);
     });
     pusherClient.bind("conversation:update", (data: any) => {
-      console.log("DATA", data);
+      console.log(data);
       updateConversation(data);
+      updateCurrConversation(data);
     });
     return () => {
       pusherClient?.unsubscribe(userId);
@@ -289,98 +276,10 @@ function Sidebar() {
       {conversations &&
         conversations?.map((conversation) => {
           return (
-            <Link
-              style={{ width: "100%" }}
-              href={`/messenger/conversations/${conversation._id}`}
-              passHref
+            <ConversationBox
               key={conversation._id}
-              onClick={() => {
-                setCurrConversation(conversation);
-                if (
-                  isShowBoxNewConversation &&
-                  waitingForAddedToGroup.length === 0
-                )
-                  setIsShowBoxNewConversation(false);
-              }}
-            >
-              <HStack
-                alignItems="center"
-                justifyContent="flex-start"
-                _hover={{
-                  bgColor: "bgLightActive.100",
-                }}
-                bgColor={
-                  conversation._id === currConversation?._id
-                    ? "bgLightActive.100"
-                    : "transparent"
-                }
-                p="10px"
-                mr="6px"
-                borderRadius="10px"
-                role="group"
-              >
-                <ThumbConversation conversation={conversation} size="md" />
-                <VStack alignItems="center" gap="0">
-                  <Text
-                    display={{ base: "none", lg: "inline" }}
-                    fontWeight="500"
-                    mr="auto"
-                  >
-                    {conversation.isGroup
-                      ? conversation.name
-                      : conversation.members[0]._id === userId
-                      ? conversation.members[1]?.displayName
-                      : conversation.members[0].displayName}
-                  </Text>
-                  {conversation.messages.length > 0 && (
-                    <Text
-                      display={{ base: "none", lg: "inline" }}
-                      color="textSecond.100"
-                      fontWeight="300"
-                      fontSize="1.2rem"
-                      maxH="180px"
-                      mr="auto"
-                    >
-                      {conversation.messages[conversation.messages.length - 1]
-                        .sender._id === userId
-                        ? "Bạn: "
-                        : conversation.messages[
-                            conversation.messages.length - 1
-                          ].sender.firstName}
-                      :{" "}
-                      {
-                        conversation.messages[conversation.messages.length - 1]
-                          .content
-                      }{" "}
-                      ·{" "}
-                      {convertTime(
-                        conversation.messages[conversation.messages.length - 1]
-                          .createdAt
-                      )}
-                    </Text>
-                  )}
-                </VStack>
-                <Button
-                  w="32px"
-                  h="32px"
-                  borderRadius="50%"
-                  boxShadow="0 0 0 1px rgba(0,0,0,0.1)"
-                  ml="auto"
-                  alignItems="center"
-                  display="none"
-                  _groupHover={{
-                    display: { base: "none", lg: "flex" },
-                  }}
-                  fontSize="24px"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                >
-                  <TfiMoreAlt />
-                </Button>
-              </HStack>
-            </Link>
+              conversation={conversation}
+            />
           );
         })}
       {conversations?.length === 0 && !isShowBoxNewConversation && (

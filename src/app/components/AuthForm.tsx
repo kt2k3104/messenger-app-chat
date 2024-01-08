@@ -16,6 +16,7 @@ import requestApi from "~/utils/api";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useRouter } from "next/navigation";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import { stat } from "fs";
 
 type Inputs = {
   firstName: string;
@@ -38,10 +39,14 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const router = useRouter();
   const toast = useToast();
 
-  const setBasicUserInfo = useUserInfo(
-    (state: UserInfoState) => state.setBasicUserInfo
-  );
+  const setUserInfo = useUserInfo((state: UserInfoState) => state.setUserInfo);
   const setFriends = useUserInfo((state: UserInfoState) => state.setFriends);
+  const setFriendRequests = useUserInfo(
+    (state: UserInfoState) => state.setFriendRequests
+  );
+  const setStrangeUsers = useUserInfo(
+    (state: UserInfoState) => state.setStrangeUsers
+  );
   const setConversation = useConversations(
     (state: ConversationsState) => state.setConversations
   );
@@ -120,11 +125,8 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         );
         localStorage.setItem("userId", responseData.metadata.userId);
 
-        const { data: allUser } = await requestApi("users", "GET", null);
-        setFriends(allUser);
-
         const { data: usersData } = await requestApi("users/me", "GET", null);
-        setBasicUserInfo({
+        setUserInfo({
           firstName: usersData.metadata.firstName,
           lastName: usersData.metadata.lastName,
           avatar: usersData.metadata.avatar,
@@ -132,6 +134,10 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           displayName: usersData.metadata.displayName,
           email: usersData.metadata.email,
         });
+
+        setFriends(usersData.metadata.friends);
+        setFriendRequests(usersData.metadata.friendRequests);
+        setStrangeUsers(usersData.metadata.strangers);
 
         const { data: conversationsData } = await requestApi(
           "conversations",
@@ -141,32 +147,14 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         setConversation(conversationsData.metadata);
         if (conversationsData.metadata[0]) {
           setCurrConversation(conversationsData.metadata[0]);
-
-          router.push(
-            "/messenger/conversations/" + conversationsData.metadata[0]._id
-          );
+          window.location.href =
+            "/messenger/conversations/" + conversationsData.metadata[0]._id;
         } else {
-          router.push("/messenger/conversations");
+          window.location.href = "/messenger/conversations";
         }
       }
     } catch (error) {
       console.log(error);
-      // if ((error as any).response.data.message === "Email is not registred.") {
-      //   toast({
-      //     status: "error",
-      //     position: "top",
-      //     title: `Tài khoản không tồn tại`,
-      //     duration: 3000,
-      //   });
-      // }
-      // if ((error as any).response.data.message === "Password is not correct") {
-      //   toast({
-      //     status: "error",
-      //     position: "top",
-      //     title: `Mật khẩu không đúng`,
-      //     duration: 3000,
-      //   });
-      // }
     }
   };
 

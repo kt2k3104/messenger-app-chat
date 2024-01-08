@@ -1,25 +1,44 @@
 import { create } from "zustand";
 
 export interface UserInfoState {
-  basicUserInfo: BasicUserInfo | null;
-  friends: BasicUserInfo[];
-  setBasicUserInfo: (basicUserInfo: BasicUserInfo) => void;
-  setFriends: (friends: BasicUserInfo[]) => void;
+  userInfo: UserInfo | null;
+  friends: UserInfo[];
+  friendRequests: FriendRequest[];
+  strangeUsers: StrangeUserInfo[];
+  setStrangeUsers: (strangeUsers: StrangeUserInfo[]) => void;
+  setFriendRequests: (friendRequests: FriendRequest[]) => void;
+  setUserInfo: (UserInfo: UserInfo) => void;
+  setFriends: (friends: UserInfo[]) => void;
 }
 
-export interface BasicUserInfo {
+export interface UserInfo {
   displayName: string;
   avatar: string;
   email: string;
   firstName: string;
+  // friends: BasicUserInfo[];
+  // friendRequests: FriendRequest[];
   lastName: string;
   _id: string;
 }
 
+// export type BasicUserInfo = Omit<UserInfo, "friends" | "friendRequests">;
+
+export type FriendRequest = {
+  sender: UserInfo;
+  message: string;
+  _id: string;
+  createdAt: string;
+};
+
+export type StrangeUserInfo = UserInfo & {
+  mutualFriends: UserInfo[];
+};
+
 export interface Conversation {
   _id: string;
   admin: string[];
-  members: BasicUserInfo[];
+  members: UserInfo[];
   messages: Message[];
   name: string;
   isGroup: boolean;
@@ -34,20 +53,25 @@ export interface Message {
   _id: string;
   content: string;
   type: string;
-  sender: BasicUserInfo;
-  seenUsers: BasicUserInfo[];
+  sender: UserInfo;
+  seenUsers: UserInfo[];
   conversationId: string;
   createdAt: string;
   updatedAt: string;
+  images: string[];
   __v: number;
 }
 
 const useUserInfo = create<UserInfoState>((set) => ({
-  basicUserInfo: null,
-  authUserInfo: null,
+  userInfo: null,
   friends: [],
-  setBasicUserInfo: (basicUserInfo: BasicUserInfo) => set({ basicUserInfo }),
-  setFriends: (friends: BasicUserInfo[]) => set({ friends }),
+  friendRequests: [],
+  strangeUsers: [],
+  setStrangeUsers: (strangeUsers: StrangeUserInfo[]) => set({ strangeUsers }),
+  setFriendRequests: (friendRequests: FriendRequest[]) =>
+    set({ friendRequests }),
+  setUserInfo: (userInfo: UserInfo) => set({ userInfo }),
+  setFriends: (friends: UserInfo[]) => set({ friends }),
 }));
 
 export default useUserInfo;

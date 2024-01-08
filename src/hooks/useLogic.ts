@@ -1,15 +1,15 @@
 import { create } from "zustand";
-import { BasicUserInfo } from "./useUserInfo";
+import { UserInfo } from "./useUserInfo";
 
 export interface LogicState {
   isShowSidebarRight: boolean;
   setIsShowSidebarRight: (isShowSidebarRight: boolean) => void;
   isShowBoxNewConversation: boolean;
   setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) => void;
-  waitingForAddedToGroup: BasicUserInfo[];
-  setWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo[]) => void;
-  pushWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo) => void;
-  popWaitingForAddedToGroup: (removedToqueue: BasicUserInfo) => void;
+  waitingForAddedToGroup: UserInfo[];
+  setWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo[]) => void;
+  pushWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo) => void;
+  popWaitingForAddedToGroup: (removedToqueue: UserInfo) => void;
 }
 
 const useLogic = create<LogicState>((set) => ({
@@ -20,16 +20,16 @@ const useLogic = create<LogicState>((set) => ({
   isShowBoxNewConversation: false,
   setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) =>
     set({ isShowBoxNewConversation }),
-  setWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo[]) =>
+  setWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo[]) =>
     set({ waitingForAddedToGroup }),
-  pushWaitingForAddedToGroup: (waitingForAddedToGroup: BasicUserInfo) =>
+  pushWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo) =>
     set((state) => ({
       waitingForAddedToGroup: [
         ...state.waitingForAddedToGroup,
         waitingForAddedToGroup,
       ],
     })),
-  popWaitingForAddedToGroup: (removedToqueue: BasicUserInfo) =>
+  popWaitingForAddedToGroup: (removedToqueue: UserInfo) =>
     set((state) => ({
       waitingForAddedToGroup: state.waitingForAddedToGroup.filter(
         (user) => user._id !== removedToqueue._id

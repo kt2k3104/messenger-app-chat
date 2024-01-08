@@ -18,7 +18,13 @@ const useActiveChannel = () => {
       setActiveChannel(channel);
     }
 
-    channel.bind("pusher:subscription_succeeded", (members: any) => {});
+    channel.bind("pusher:subscription_succeeded", (members: any) => {
+      const initialMembers: string[] = [];
+      members.each((member: any) => {
+        initialMembers.push(member.id);
+      });
+      set(initialMembers);
+    });
 
     channel.bind("pusher:subscription_error", (error: any) => {
       console.log("subcription:::error", error);

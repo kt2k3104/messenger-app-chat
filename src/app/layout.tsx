@@ -15,9 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const setFriends = useUserInfo((state: UserInfoState) => state.setFriends);
-  const setBasicUserInfo = useUserInfo(
-    (state: UserInfoState) => state.setBasicUserInfo
+  const setFriendRequests = useUserInfo(
+    (state: UserInfoState) => state.setFriendRequests
   );
+  const setStrangeUsers = useUserInfo(
+    (state: UserInfoState) => state.setStrangeUsers
+  );
+  const setUserInfo = useUserInfo((state: UserInfoState) => state.setUserInfo);
   const setConversation = useConversations(
     (state: ConversationsState) => state.setConversations
   );
@@ -33,11 +37,8 @@ export default function RootLayout({
         const access_token = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId");
         if (access_token && userId) {
-          const { data: allUser } = await requestApi("users", "GET", null);
-          setFriends(allUser);
-
           const { data: usersData } = await requestApi("users/me", "GET", null);
-          setBasicUserInfo({
+          setUserInfo({
             firstName: usersData.metadata.firstName,
             lastName: usersData.metadata.lastName,
             avatar: usersData.metadata.avatar,
@@ -45,6 +46,9 @@ export default function RootLayout({
             displayName: usersData.metadata.displayName,
             email: usersData.metadata.email,
           });
+          setFriends(usersData.metadata.friends);
+          setFriendRequests(usersData.metadata.friendRequests);
+          setStrangeUsers(usersData.metadata.strangers);
           const { data: conversationsData } = await requestApi(
             "conversations",
             "GET",

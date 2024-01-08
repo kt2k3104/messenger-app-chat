@@ -7,16 +7,20 @@ import {
   Text,
   VStack,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import { useEffect, useState } from "react";
 import { FaLock, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
+import { TfiMoreAlt } from "react-icons/tfi";
+import { FiPlus } from "react-icons/fi";
 
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import ThumbConversation from "../components/ThumbConversation";
+import ModalAddPeople from "./ModalAddPeople";
 
 export default function SidebarRight() {
   const isShowSidebarRight = useLogic(
@@ -28,17 +32,21 @@ export default function SidebarRight() {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-  const userId = useUserInfo(
-    (state: UserInfoState) => state.basicUserInfo?._id
-  );
-  // const widthOfWindow = window?.innerWidth;
+  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   const [browserWidth, setBrowserWidth] = useState(0);
   const [isShowOption1, setIsShowOption1] = useState(false);
   const [isShowOption2, setIsShowOption2] = useState(false);
   const [isShowOption3, setIsShowOption3] = useState(false);
+  const [isShowOption4, setIsShowOption4] = useState(false);
+  const [isShowOption5, setIsShowOption5] = useState(false);
 
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
   const bgButton = useColorModeValue("#f5f5f5", "#ffffff1a");
+  const {
+    isOpen: isOpenModalAddPeople,
+    onOpen: onOpenModalAddPeople,
+    onClose: onCloseModalAddPeople,
+  } = useDisclosure();
 
   const handleResize = () => {
     setBrowserWidth(window.innerWidth);
@@ -67,6 +75,7 @@ export default function SidebarRight() {
       borderColor={bg}
       gap="0"
       p="16px 0 0 0"
+      overflow="auto"
     >
       {currConversation && (
         <ThumbConversation conversation={currConversation} size="lg" />
@@ -130,6 +139,49 @@ export default function SidebarRight() {
         </VStack>
       </HStack>
       <Box p="20px 8px">
+        {currConversation?.isGroup && (
+          <>
+            <Button
+              bgColor="transparent"
+              w="100%"
+              h="44px"
+              p="10px 5px"
+              justifyContent="space-between"
+              fontSize="1.4rem"
+              fontWeight="500"
+              onClick={() => {
+                setIsShowOption1(!isShowOption1);
+              }}
+            >
+              Thông tin về đoạn chat
+              {isShowOption1 ? <FaChevronRight /> : <FaChevronDown />}
+            </Button>
+            {isShowOption1 && (
+              <Button
+                bgColor="transparent"
+                w="100%"
+                h="44px"
+                p="10px 5px"
+                justifyContent="left"
+                fontSize="1.4rem"
+                fontWeight="500"
+              >
+                <Button
+                  as="div"
+                  w="28px"
+                  h="28px"
+                  p="0"
+                  borderRadius="50%"
+                  mr="8px"
+                  bgColor={bgButton}
+                >
+                  <CustomIcons.icon_pinned_message />
+                </Button>
+                Xem tin nhắn đã ghim
+              </Button>
+            )}
+          </>
+        )}
         <Button
           bgColor="transparent"
           w="100%"
@@ -139,13 +191,13 @@ export default function SidebarRight() {
           fontSize="1.4rem"
           fontWeight="500"
           onClick={() => {
-            setIsShowOption1(!isShowOption1);
+            setIsShowOption2(!isShowOption2);
           }}
         >
           Tùy chỉnh đoạn chat
-          {isShowOption1 ? <FaChevronRight /> : <FaChevronDown />}
+          {isShowOption2 ? <FaChevronRight /> : <FaChevronDown />}
         </Button>
-        {isShowOption1 && (
+        {isShowOption2 && (
           <>
             <Button
               bgColor="transparent"
@@ -157,6 +209,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -178,6 +231,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -199,6 +253,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -212,6 +267,108 @@ export default function SidebarRight() {
             </Button>
           </>
         )}
+        {currConversation?.isGroup && (
+          <>
+            <Button
+              bgColor="transparent"
+              w="100%"
+              h="44px"
+              p="10px 5px"
+              justifyContent="space-between"
+              fontSize="1.4rem"
+              fontWeight="500"
+              onClick={() => {
+                setIsShowOption3(!isShowOption3);
+              }}
+            >
+              Thành viên trong đoạn chat
+              {isShowOption3 ? <FaChevronRight /> : <FaChevronDown />}
+            </Button>
+            {isShowOption3 && (
+              <>
+                {currConversation.members.map((user) => {
+                  return (
+                    <HStack
+                      gap="0"
+                      key={user._id}
+                      bgColor="transparent"
+                      w="100%"
+                      h="44px"
+                      p="10px 5px"
+                      justifyContent="left"
+                      fontSize="1.4rem"
+                      fontWeight="500"
+                      _hover={{ bgColor: "transparent" }}
+                    >
+                      <Img
+                        src="/images/no-image.png"
+                        alt="avt"
+                        w="36px"
+                        h="36px"
+                        borderRadius="50%"
+                      />
+                      <VStack ml="8px" alignItems="flex-start" gap="0">
+                        <Text fontSize="1.4rem">{user.displayName}</Text>
+                        <Text fontSize="1.2rem" fontWeight="300">
+                          Do admin thêm
+                        </Text>
+                      </VStack>
+                      <Button
+                        w="36px"
+                        h="36px"
+                        borderRadius="50%"
+                        ml="auto"
+                        alignItems="center"
+                        fontSize="24px"
+                        bgColor="transparent"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <TfiMoreAlt />
+                      </Button>
+                    </HStack>
+                  );
+                })}
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="52px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                  borderRadius="8px"
+                  _hover={{
+                    bgColor: "bgLightActive.100",
+                  }}
+                  onClick={onOpenModalAddPeople}
+                >
+                  <Button
+                    as="div"
+                    w="36px"
+                    h="36px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                    _hover={{ bgColor: bgButton }}
+                  >
+                    <FiPlus />
+                  </Button>
+                  Thêm Người
+                </Button>
+                <ModalAddPeople
+                  isOpenModalAddPeople={isOpenModalAddPeople}
+                  onCloseModalAddPeople={onCloseModalAddPeople}
+                  conversationMembers={currConversation.members}
+                  conversationId={currConversation._id}
+                />
+              </>
+            )}
+          </>
+        )}
         <Button
           bgColor="transparent"
           w="100%"
@@ -221,13 +378,13 @@ export default function SidebarRight() {
           fontSize="1.4rem"
           fontWeight="500"
           onClick={() => {
-            setIsShowOption2(!isShowOption2);
+            setIsShowOption4(!isShowOption4);
           }}
         >
           File phương tiện & file
-          {isShowOption2 ? <FaChevronRight /> : <FaChevronDown />}
+          {isShowOption4 ? <FaChevronRight /> : <FaChevronDown />}
         </Button>
-        {isShowOption2 && (
+        {isShowOption4 && (
           <>
             <Button
               bgColor="transparent"
@@ -239,6 +396,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -260,6 +418,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -282,13 +441,13 @@ export default function SidebarRight() {
           fontSize="1.4rem"
           fontWeight="500"
           onClick={() => {
-            setIsShowOption3(!isShowOption3);
+            setIsShowOption5(!isShowOption5);
           }}
         >
           Quyền riêng tư & hỗ trợ
-          {isShowOption3 ? <FaChevronRight /> : <FaChevronDown />}
+          {isShowOption5 ? <FaChevronRight /> : <FaChevronDown />}
         </Button>
-        {isShowOption3 && (
+        {isShowOption5 && (
           <>
             <Button
               bgColor="transparent"
@@ -300,6 +459,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -321,6 +481,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -342,6 +503,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -364,6 +526,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -385,6 +548,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -406,6 +570,7 @@ export default function SidebarRight() {
               fontWeight="500"
             >
               <Button
+                as="div"
                 w="28px"
                 h="28px"
                 p="0"
@@ -418,7 +583,15 @@ export default function SidebarRight() {
               </Button>
               <Box>
                 <Text textAlign="left">Báo cáo</Text>
-                <Text fontSize="12px" color="#65676B" fontWeight="400">
+                <Text
+                  fontSize="12px"
+                  w="200px"
+                  textOverflow="ellipsis"
+                  overflow="hidden"
+                  color="#65676B"
+                  fontWeight="400"
+                  whiteSpace="nowrap"
+                >
                   Đóng góp ý kiến và báo cáo cuộc trò chuyện
                 </Text>
               </Box>

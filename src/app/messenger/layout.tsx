@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   const [expanded, setExpanded] = useState(false);
 
-  const user = useUserInfo((state: UserInfoState) => state.basicUserInfo);
+  const user = useUserInfo((state: UserInfoState) => state.userInfo);
   const { colorMode, toggleColorMode } = useColorMode();
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
@@ -31,7 +31,7 @@ export default function RootLayout({
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
 
   return (
-    <HStack h="100vh" position="relative">
+    <HStack h="100vh" position="relative" gap="0">
       <VStack
         w={expanded ? "249px" : "61px"}
         h="100vh"
@@ -147,7 +147,9 @@ export default function RootLayout({
           </Button>
         </Box>
       </VStack>
-      <Box flex="1">{children}</Box>
+      <Box flex="1" h="100vh">
+        {children}
+      </Box>
       <Button position="absolute" top="0" right="0" onClick={toggleColorMode}>
         {colorMode}
       </Button>

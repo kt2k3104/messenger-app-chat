@@ -15,7 +15,7 @@ import { useDebounce } from "use-debounce";
 import { IoIosClose } from "react-icons/io";
 
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import useUserInfo, { BasicUserInfo, UserInfoState } from "~/hooks/useUserInfo";
+import useUserInfo, { UserInfo, UserInfoState } from "~/hooks/useUserInfo";
 import ChatContent from "../[conversationId]/ChatContent";
 import NewConversation from "./NewConversation";
 
@@ -38,24 +38,22 @@ function New() {
   const setIsShowBoxNewConversation = useLogic(
     (state: LogicState) => state.setIsShowBoxNewConversation
   );
-  const currUserId = useUserInfo(
-    (state: UserInfoState) => state.basicUserInfo?._id
-  );
+  const currUserId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   console.log(currUserId);
 
   let showResults: any;
   if (!waitingForAddedToGroup.length) {
-    showResults = searchResults?.filter((result: BasicUserInfo) => {
+    showResults = searchResults?.filter((result: UserInfo) => {
       return result._id !== currUserId;
     });
   }
-  waitingForAddedToGroup.forEach((user: BasicUserInfo, index) => {
+  waitingForAddedToGroup.forEach((user: UserInfo, index) => {
     if (index === 0) {
-      showResults = searchResults?.filter((result: BasicUserInfo) => {
+      showResults = searchResults?.filter((result: UserInfo) => {
         return result._id !== user._id && result._id !== currUserId;
       });
     } else {
-      showResults = showResults?.filter((result: BasicUserInfo) => {
+      showResults = showResults?.filter((result: UserInfo) => {
         return result._id !== user._id && result._id !== currUserId;
       });
     }

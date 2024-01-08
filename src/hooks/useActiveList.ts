@@ -1,6 +1,7 @@
+import { m } from "framer-motion";
 import { create } from "zustand";
 
-interface ActiveListStore {
+export interface ActiveListStore {
   members: string[];
   add: (id: string) => void;
   remove: (id: string) => void;
@@ -9,7 +10,11 @@ interface ActiveListStore {
 
 const useActiveList = create<ActiveListStore>((set) => ({
   members: [],
-  add: (id) => set((state) => ({ members: [...state.members, id] })),
+  add: (id) =>
+    set((state) => {
+      if (state.members.includes(id)) return state;
+      return { members: [...state.members, id] };
+    }),
   remove: (id) =>
     set((state) => ({
       members: state.members.filter((memberId) => memberId !== id),
