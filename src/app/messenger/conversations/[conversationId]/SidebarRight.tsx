@@ -4,13 +4,18 @@ import {
   Button,
   HStack,
   Img,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   Text,
   VStack,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaLock, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { TfiMoreAlt } from "react-icons/tfi";
@@ -21,6 +26,19 @@ import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import ThumbConversation from "../components/ThumbConversation";
 import ModalAddPeople from "./ModalAddPeople";
+import ModalRenameConversation from "./ModalRenameConversation";
+import ModalUpdateAvatarConversation from "./ModalUpdateAvatarConversation";
+import ModalLeaveConversation from "./ModalLeaveConversation";
+import ModalRemoveMember from "./ModalRemoveMember";
+import ModalAddAdmin from "./ModalAddAdmin";
+import DrawerElement from "./DrawerElement";
+import { on } from "events";
+
+export enum OptionOpenDrawer {
+  MediaFiles,
+  File,
+  Link,
+}
 
 export default function SidebarRight() {
   const isShowSidebarRight = useLogic(
@@ -29,16 +47,23 @@ export default function SidebarRight() {
   const setIsShowSidebarRight = useLogic(
     (state: LogicState) => state.setIsShowSidebarRight
   );
+  const setIsShowBoxSearchMessage = useLogic(
+    (state: LogicState) => state.setIsShowBoxSearchMessage
+  );
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
   const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
-  const [browserWidth, setBrowserWidth] = useState(0);
+  const [browserWidth, setBrowserWidth] = useState(window.innerWidth);
   const [isShowOption1, setIsShowOption1] = useState(false);
   const [isShowOption2, setIsShowOption2] = useState(false);
   const [isShowOption3, setIsShowOption3] = useState(false);
   const [isShowOption4, setIsShowOption4] = useState(false);
   const [isShowOption5, setIsShowOption5] = useState(false);
+
+  const [optionOpenDrawer, setOptionOpenDrawer] = useState(
+    OptionOpenDrawer.MediaFiles
+  );
 
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
   const bgButton = useColorModeValue("#f5f5f5", "#ffffff1a");
@@ -47,6 +72,39 @@ export default function SidebarRight() {
     onOpen: onOpenModalAddPeople,
     onClose: onCloseModalAddPeople,
   } = useDisclosure();
+
+  const {
+    isOpen: isOpenModalRenameConversation,
+    onOpen: onOpenModalRenameConversation,
+    onClose: onCloseModalRenameConversation,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenModalUpdateAvatarConversation,
+    onOpen: onOpenModalUpdateAvatarConversation,
+    onClose: onCloseModalUpdateAvatarConversation,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenModalLeaveConversation,
+    onOpen: onOpenModalLeaveConversation,
+    onClose: onCloseModalLeaveConversation,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenModalRemoveMember,
+    onOpen: onOpenModalRemoveMember,
+    onClose: onCloseModalRemoveMember,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenModalAddAdmin,
+    onOpen: onOpenModalAddAdmin,
+    onClose: onCloseModalAddAdmin,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenDrawer,
+    onOpen: onOpenDrawer,
+    onClose: onCloseDrawer,
+  } = useDisclosure();
+
+  const btnRef = useRef<any>();
 
   const handleResize = () => {
     setBrowserWidth(window.innerWidth);
@@ -61,7 +119,9 @@ export default function SidebarRight() {
   }, []);
   useEffect(() => {
     if (browserWidth < 900) {
+      console.log(browserWidth);
       setIsShowSidebarRight(false);
+      onCloseDrawer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [browserWidth]);
@@ -199,6 +259,73 @@ export default function SidebarRight() {
         </Button>
         {isShowOption2 && (
           <>
+            {currConversation?.isGroup && (
+              <>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                  onClick={onOpenModalRenameConversation}
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_change_name_conversation />
+                  </Button>
+                  Đổi tên đoạn chat
+                </Button>
+                <ModalRenameConversation
+                  isOpenModalRenameConversation={isOpenModalRenameConversation}
+                  onCloseModalRenameConversation={
+                    onCloseModalRenameConversation
+                  }
+                  conversationId={currConversation?._id}
+                  conversationName={currConversation?.name}
+                />
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                  onClick={onOpenModalUpdateAvatarConversation}
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_change_avatar_conversation />
+                  </Button>
+                  Thay đổi ảnh
+                </Button>
+                <ModalUpdateAvatarConversation
+                  isOpenModalUpdateAvatarConversation={
+                    isOpenModalUpdateAvatarConversation
+                  }
+                  onCloseModalUpdateAvatarConversation={
+                    onCloseModalUpdateAvatarConversation
+                  }
+                  conversationId={currConversation?._id}
+                />
+              </>
+            )}
             <Button
               bgColor="transparent"
               w="100%"
@@ -265,6 +392,31 @@ export default function SidebarRight() {
               </Button>
               Chỉnh sửa biệt danh
             </Button>
+            <Button
+              bgColor="transparent"
+              w="100%"
+              h="44px"
+              p="10px 5px"
+              justifyContent="left"
+              fontSize="1.4rem"
+              fontWeight="500"
+              onClick={() => {
+                setIsShowBoxSearchMessage(true);
+              }}
+            >
+              <Button
+                as="div"
+                w="28px"
+                h="28px"
+                p="0"
+                borderRadius="50%"
+                mr="8px"
+                bgColor={bgButton}
+              >
+                <CustomIcons.icon_search_in_conversation />
+              </Button>
+              Tìm kiếm trong cuộc trò chuyện
+            </Button>
           </>
         )}
         {currConversation?.isGroup && (
@@ -313,21 +465,160 @@ export default function SidebarRight() {
                           Do admin thêm
                         </Text>
                       </VStack>
-                      <Button
-                        w="36px"
-                        h="36px"
-                        borderRadius="50%"
-                        ml="auto"
-                        alignItems="center"
-                        fontSize="24px"
-                        bgColor="transparent"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                      >
-                        <TfiMoreAlt />
-                      </Button>
+                      <Popover>
+                        <PopoverTrigger>
+                          <Button
+                            w="36px"
+                            h="36px"
+                            borderRadius="50%"
+                            ml="auto"
+                            alignItems="center"
+                            fontSize="24px"
+                            bgColor="transparent"
+                            onClick={(e) => {}}
+                          >
+                            <TfiMoreAlt />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent maxW="328px" w="328px" p="4px">
+                          <PopoverArrow />
+                          <PopoverBody p="0">
+                            <Button
+                              bgColor="transparent"
+                              w="320px"
+                              h="44px"
+                              p="10px 5px"
+                              justifyContent="left"
+                              fontSize="1.4rem"
+                              fontWeight="500"
+                            >
+                              <Button
+                                as="div"
+                                w="28px"
+                                h="28px"
+                                p="0"
+                                borderRadius="50%"
+                                mr="8px"
+                                bgColor={bgButton}
+                              >
+                                <CustomIcons.icon_chat />
+                              </Button>
+                              Nhắn tin
+                            </Button>
+                            <Button
+                              bgColor="transparent"
+                              w="320px"
+                              h="44px"
+                              p="10px 5px"
+                              justifyContent="left"
+                              fontSize="1.4rem"
+                              fontWeight="500"
+                            >
+                              <Button
+                                as="div"
+                                w="28px"
+                                h="28px"
+                                p="0"
+                                borderRadius="50%"
+                                mr="8px"
+                                bgColor={bgButton}
+                              >
+                                <CustomIcons.icon_users />
+                              </Button>
+                              Xem trang cá nhân
+                            </Button>
+                            <Button
+                              bgColor="transparent"
+                              w="320px"
+                              h="44px"
+                              p="10px 5px"
+                              justifyContent="left"
+                              fontSize="1.4rem"
+                              fontWeight="500"
+                            >
+                              <Button
+                                as="div"
+                                w="28px"
+                                h="28px"
+                                p="0"
+                                borderRadius="50%"
+                                mr="8px"
+                                bgColor={bgButton}
+                              >
+                                <CustomIcons.icon_block />
+                              </Button>
+                              Chặn
+                            </Button>
+                            <Box
+                              w="296px"
+                              h="1px"
+                              bgColor="#CED0D4"
+                              m="8px 16px"
+                            />
+                            <Button
+                              bgColor="transparent"
+                              w="320px"
+                              h="44px"
+                              p="10px 5px"
+                              justifyContent="left"
+                              fontSize="1.4rem"
+                              fontWeight="500"
+                              onClick={onOpenModalAddAdmin}
+                            >
+                              <Button
+                                as="div"
+                                w="28px"
+                                h="28px"
+                                p="0"
+                                borderRadius="50%"
+                                mr="8px"
+                                bgColor={bgButton}
+                              >
+                                <CustomIcons.icon_add_admin />
+                              </Button>
+                              Chỉ định làm quản trị viên
+                            </Button>
+                            <ModalAddAdmin
+                              isOpenModalAddAdmin={isOpenModalAddAdmin}
+                              onCloseModalAddAdmin={onCloseModalAddAdmin}
+                              conversationId={currConversation._id}
+                              userId={user._id}
+                              userName={user.displayName}
+                            />
+                            <Button
+                              bgColor="transparent"
+                              w="320px"
+                              h="44px"
+                              p="10px 5px"
+                              justifyContent="left"
+                              fontSize="1.4rem"
+                              fontWeight="500"
+                              onClick={onOpenModalRemoveMember}
+                            >
+                              <Button
+                                as="div"
+                                w="28px"
+                                h="28px"
+                                p="0"
+                                borderRadius="50%"
+                                mr="8px"
+                                bgColor={bgButton}
+                              >
+                                <CustomIcons.icon_remove_member />
+                              </Button>
+                              Xóa thành viên
+                            </Button>
+                            <ModalRemoveMember
+                              isOpenModalRemoveMember={isOpenModalRemoveMember}
+                              onCloseModalRemoveMember={
+                                onCloseModalRemoveMember
+                              }
+                              conversationId={currConversation._id}
+                              userId={user._id}
+                            />
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Popover>
                     </HStack>
                   );
                 })}
@@ -381,7 +672,7 @@ export default function SidebarRight() {
             setIsShowOption4(!isShowOption4);
           }}
         >
-          File phương tiện & file
+          File phương tiện, file và liên kết
           {isShowOption4 ? <FaChevronRight /> : <FaChevronDown />}
         </Button>
         {isShowOption4 && (
@@ -394,6 +685,11 @@ export default function SidebarRight() {
               justifyContent="left"
               fontSize="1.4rem"
               fontWeight="500"
+              ref={btnRef}
+              onClick={() => {
+                onOpenDrawer();
+                setOptionOpenDrawer(OptionOpenDrawer.MediaFiles);
+              }}
             >
               <Button
                 as="div"
@@ -416,6 +712,11 @@ export default function SidebarRight() {
               justifyContent="left"
               fontSize="1.4rem"
               fontWeight="500"
+              ref={btnRef}
+              onClick={() => {
+                onOpenDrawer();
+                setOptionOpenDrawer(OptionOpenDrawer.File);
+              }}
             >
               <Button
                 as="div"
@@ -430,6 +731,41 @@ export default function SidebarRight() {
               </Button>
               File
             </Button>
+            <Button
+              bgColor="transparent"
+              w="100%"
+              h="44px"
+              p="10px 5px"
+              justifyContent="left"
+              fontSize="1.4rem"
+              fontWeight="500"
+              ref={btnRef}
+              onClick={() => {
+                onOpenDrawer();
+                setOptionOpenDrawer(OptionOpenDrawer.Link);
+              }}
+            >
+              <Button
+                as="div"
+                w="28px"
+                h="28px"
+                p="0"
+                borderRadius="50%"
+                mr="8px"
+                bgColor={bgButton}
+              >
+                <CustomIcons.icon_link />
+              </Button>
+              Liên kết
+            </Button>
+            <DrawerElement
+              isOpenDrawer={isOpenDrawer}
+              onCloseDrawer={onCloseDrawer}
+              btnRef={btnRef}
+              optionOpenDrawer={optionOpenDrawer}
+              setOptionOpenDrawer={setOptionOpenDrawer}
+              conversationId={currConversation?._id}
+            />
           </>
         )}
         <Button
@@ -471,95 +807,99 @@ export default function SidebarRight() {
               </Button>
               Tắt thông báo
             </Button>
-            <Button
-              bgColor="transparent"
-              w="100%"
-              h="44px"
-              p="10px 5px"
-              justifyContent="left"
-              fontSize="1.4rem"
-              fontWeight="500"
-            >
-              <Button
-                as="div"
-                w="28px"
-                h="28px"
-                p="0"
-                borderRadius="50%"
-                mr="8px"
-                bgColor={bgButton}
-              >
-                <CustomIcons.icon_temporary_message />
-              </Button>
-              Tin nhắn tạm thời
-            </Button>
-            <Button
-              bgColor="transparent"
-              w="100%"
-              h="44px"
-              p="10px 5px"
-              justifyContent="left"
-              fontSize="1.4rem"
-              fontWeight="500"
-            >
-              <Button
-                as="div"
-                w="28px"
-                h="28px"
-                p="0"
-                borderRadius="50%"
-                mr="8px"
-                fontSize="14px"
-                bgColor={bgButton}
-              >
-                <FaLock />
-              </Button>
-              Xác minh mã hóa đầu cuối
-            </Button>
-            <Button
-              bgColor="transparent"
-              w="100%"
-              h="44px"
-              p="10px 5px"
-              justifyContent="left"
-              fontSize="1.4rem"
-              fontWeight="500"
-            >
-              <Button
-                as="div"
-                w="28px"
-                h="28px"
-                p="0"
-                borderRadius="50%"
-                mr="8px"
-                bgColor={bgButton}
-              >
-                <CustomIcons.icon_limt />
-              </Button>
-              Hạn chế
-            </Button>
-            <Button
-              bgColor="transparent"
-              w="100%"
-              h="44px"
-              p="10px 5px"
-              justifyContent="left"
-              fontSize="1.4rem"
-              fontWeight="500"
-            >
-              <Button
-                as="div"
-                w="28px"
-                h="28px"
-                p="0"
-                borderRadius="50%"
-                mr="8px"
-                bgColor={bgButton}
-              >
-                <CustomIcons.icon_block />
-              </Button>
-              Chặn
-            </Button>
+            {!currConversation?.isGroup && (
+              <>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_temporary_message />
+                  </Button>
+                  Tin nhắn tạm thời
+                </Button>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    fontSize="14px"
+                    bgColor={bgButton}
+                  >
+                    <FaLock />
+                  </Button>
+                  Xác minh mã hóa đầu cuối
+                </Button>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_limt />
+                  </Button>
+                  Hạn chế
+                </Button>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_block />
+                  </Button>
+                  Chặn
+                </Button>
+              </>
+            )}
             <Button
               bgColor="transparent"
               w="100%"
@@ -596,6 +936,38 @@ export default function SidebarRight() {
                 </Text>
               </Box>
             </Button>
+            {currConversation?.isGroup && (
+              <>
+                <Button
+                  bgColor="transparent"
+                  w="100%"
+                  h="44px"
+                  p="10px 5px"
+                  justifyContent="left"
+                  fontSize="1.4rem"
+                  fontWeight="500"
+                  onClick={onOpenModalLeaveConversation}
+                >
+                  <Button
+                    as="div"
+                    w="28px"
+                    h="28px"
+                    p="0"
+                    borderRadius="50%"
+                    mr="8px"
+                    bgColor={bgButton}
+                  >
+                    <CustomIcons.icon_leave_conversation />
+                  </Button>
+                  Rời nhóm
+                </Button>
+                <ModalLeaveConversation
+                  isOpenModalLeaveConversation={isOpenModalLeaveConversation}
+                  onCloseModalLeaveConversation={onCloseModalLeaveConversation}
+                  conversationId={currConversation._id}
+                />
+              </>
+            )}
           </>
         )}
       </Box>

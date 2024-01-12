@@ -2,8 +2,9 @@
 
 import axios from "axios";
 
-// export const BASEURL = "https://thinhnguyen.live/api/v1";
+// export const BASEURL = "https://thinhnguyen.live/api/v1/";
 export const BASEURL = process.env.NEXT_PUBLIC_API_URL;
+
 // export const BASEURL = NEXT_PUBLIC_API_URL;
 
 export default function requestApi(
@@ -63,9 +64,9 @@ export default function requestApi(
             }
           );
           const {
-            access_token: new_access_token,
-            refresh_token: new_refresh_token,
-          } = result.data.result;
+            accessToken: new_access_token,
+            refreshToken: new_refresh_token,
+          } = result.data.metadata.token;
 
           localStorage.setItem("accessToken", new_access_token);
           localStorage.setItem("refreshToken", new_refresh_token);

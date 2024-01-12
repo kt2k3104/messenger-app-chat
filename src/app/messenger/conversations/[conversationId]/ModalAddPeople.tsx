@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Checkbox,
-  CheckboxGroup,
   HStack,
   Img,
   Input,
@@ -18,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
-import _, { forEach } from "lodash";
+import _ from "lodash";
 import requestApi from "~/utils/api";
 
 function ModalAddPeople({

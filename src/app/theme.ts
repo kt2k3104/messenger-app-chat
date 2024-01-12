@@ -51,4 +51,19 @@ export const theme = extendTheme({
       100: "#31A24C",
     },
   },
+  components: {
+    Drawer: {
+      variants: {
+        alwaysOpen: {
+          // parts: ["dialog, dialogContainer"],
+          dialog: {
+            pointerEvents: "auto",
+          },
+          dialogContainer: {
+            pointerEvents: "none",
+          },
+        },
+      },
+    },
+  },
 });

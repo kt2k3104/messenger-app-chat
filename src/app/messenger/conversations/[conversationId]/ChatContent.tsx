@@ -5,10 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
 import usePusher, { PusherState } from "~/hooks/usePusher";
 import requestApi from "~/utils/api";
-import MessageBox from "./MessageBox";
+import MessageBox, { MessageTypes } from "./MessageBox";
 import CustomIcons from "~/app/components/Icon";
 import PreviewImage from "./PreviewImage";
 import { useDebounce } from "use-debounce";
+import useLogic, { LogicState } from "~/hooks/useLogic";
 
 function ChatContent({ conversationId }: { conversationId: any }) {
   const [images, setImages] = useState<any[]>([]);
@@ -20,6 +21,11 @@ function ChatContent({ conversationId }: { conversationId: any }) {
 
   const clearTimerId = useRef<any>(null);
   const typingRef = useRef<any>(null);
+  const inputImageRef = useRef<any>(null);
+
+  const isShowBoxSearchMessage = useLogic(
+    (state: LogicState) => state.isShowBoxSearchMessage
+  );
 
   useEffect(() => {
     if (debounceMessage !== "") {
@@ -27,7 +33,15 @@ function ChatContent({ conversationId }: { conversationId: any }) {
         conversationId: conversationId,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceMessage]);
+
+  useEffect(() => {
+    if (inputImageRef.current) {
+      inputImageRef.current.value = "";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images]);
 
   const handleSubmitSendMessage = async (
     e: React.FormEvent<HTMLDivElement>
@@ -36,6 +50,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
     if (inputMessage === "" && images.length === 0) return;
     try {
       setInputMessage("");
+      setImages([]);
       if (images.length === 0) {
         await requestApi("messages", "POST", {
           conversationId: conversationId,
@@ -44,7 +59,6 @@ function ChatContent({ conversationId }: { conversationId: any }) {
       } else {
         const formData = new FormData();
         images.forEach((image) => {
-          console.log(image);
           formData.append("chats", image);
         });
         formData.append("conversationId", conversationId);
@@ -61,7 +75,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
   useEffect(() => {
     const callApi = async () => {
       const { data: messagesData } = await requestApi(
-        `messages/all/${conversationId}`,
+        `messages/${conversationId}?limit=20&direction=up`,
         "GET",
         null
       );
@@ -105,21 +119,32 @@ function ChatContent({ conversationId }: { conversationId: any }) {
       channel?.unbind("message:update");
       channel?.unbind("message:typing");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, pusherClient]);
   useEffect(() => {
     if (buttonRef.current) {
       buttonRef.current.scrollIntoView({});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, typingRef.current]);
 
   let flagUserId = "";
   let isInBlock = false;
   let isLastInBlock = false;
+
   return (
     <VStack flex="1" w="100%">
       <VStack
         overflow="auto"
-        h={images.length > 0 ? "calc(100vh - 196px)" : "calc(100vh - 116px)"}
+        h={
+          images.length > 0 && isShowBoxSearchMessage
+            ? "calc(100vh - 252px)"
+            : images.length > 0 && !isShowBoxSearchMessage
+            ? "calc(100vh - 196px)"
+            : images.length === 0 && isShowBoxSearchMessage
+            ? "calc(100vh - 172px)"
+            : "calc(100vh - 116px)"
+        }
         w="100%"
         p="10px"
         gap="0"
@@ -133,19 +158,35 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             } else {
               isInBlock = true;
               isLastInBlock = false;
+              if (
+                array[index + 1]?.type !== MessageTypes.TEXT &&
+                array[index + 1]?.type !== MessageTypes.IMAGE
+              ) {
+                isInBlock = true;
+                isLastInBlock = true;
+              }
             }
           } else {
             flagUserId = message.sender._id;
+
             if (message.sender._id !== array[index + 1]?.sender._id) {
               isInBlock = false;
               isLastInBlock = true;
             } else {
               isInBlock = false;
               isLastInBlock = false;
+              if (
+                array[index + 1]?.type !== MessageTypes.TEXT &&
+                array[index + 1]?.type !== MessageTypes.IMAGE
+              ) {
+                isInBlock = false;
+                isLastInBlock = true;
+              }
             }
           }
+
           return (
-            <HStack key={message._id} w="100%">
+            <HStack key={message._id} w="100%" justifyContent="center">
               <MessageBox
                 message={message}
                 isLastMessage={index === messages.length - 1 ? true : false}
@@ -178,6 +219,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           type="file"
           name="image"
           id="image"
+          ref={inputImageRef}
           onChange={(e) => {
             setImages((prev) => {
               if (e.target.files && e.target.files[0]) {
@@ -209,7 +251,13 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             </Button>
             {images.length !== 0 &&
               images.map((image) => {
-                return <PreviewImage imgFile={image} setImages={setImages} />;
+                return (
+                  <PreviewImage
+                    key={image + Math.random()}
+                    imgFile={image}
+                    setImages={setImages}
+                  />
+                );
               })}
           </HStack>
           <Input

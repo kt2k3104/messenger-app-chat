@@ -491,6 +491,129 @@ function IconPinnedMessage() {
     </svg>
   );
 }
+function IconChangeNameConversation() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq"
+      overflow="visible"
+      style={{ color: "var(--icon-primary-color)" }}
+    >
+      <path d="M20.953 12.569a.75.75 0 0 0-1.06 0l-8.938 8.937a4.004 4.004 0 0 0-.715.973l-2.121 4.05c-.455.867.481 1.804 1.35 1.349l4.049-2.121c.358-.188.686-.429.972-.715l8.938-8.937a.75.75 0 0 0 0-1.061l-2.475-2.475zM24.842 13.63a.75.75 0 0 0 1.06 0l1.363-1.362a2.5 2.5 0 0 0-3.536-3.536l-1.362 1.362a.75.75 0 0 0 0 1.06l2.475 2.476z"></path>
+    </svg>
+  );
+}
+function IconChangeAvatarConversation() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq"
+      overflow="visible"
+      style={{ color: "var(--icon-primary-color)" }}
+    >
+      <path d="M13.5 16.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7 12v12a4 4 0 0 0 4 4h14a4 4 0 0 0 4-4V12a4 4 0 0 0-4-4H11a4 4 0 0 0-4 4zm18-1.5H11A1.5 1.5 0 0 0 9.5 12v9.546a.25.25 0 0 0 .375.217L15 18.803a6 6 0 0 1 6 0l5.125 2.96a.25.25 0 0 0 .375-.217V12a1.5 1.5 0 0 0-1.5-1.5z"
+      ></path>
+    </svg>
+  );
+}
+function IconSearchInConversation() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq"
+      overflow="visible"
+      style={{ color: "var(--icon-primary-color)" }}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M23.522 21.662c-.389-.344-.443-.925-.181-1.373a8.5 8.5 0 1 0-3.051 3.051c.447-.261 1.028-.207 1.372.182l3.608 4.073a1.647 1.647 0 1 0 2.325-2.326l-4.073-3.607zm-3.28-9.905a6 6 0 1 1-8.484 8.486 6 6 0 0 1 8.485-8.486z"
+      ></path>
+    </svg>
+  );
+}
+function IconLink() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      className="x1lliihq x1k90msu x2h7rmj x1qfuztq x19dipnz"
+      fill="currentColor"
+      height="24"
+      width="24"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path d="M21.996 19.317c-1.405 1.406-3.747 1.408-5.23-.075a1.25 1.25 0 00-1.768 1.768c2.423 2.424 6.349 2.494 8.767.076l3.46-3.461c2.419-2.418 2.35-6.344-.075-8.767-2.423-2.424-6.348-2.494-8.766-.076l-.557.557a1.25 1.25 0 001.769 1.768l.556-.556c1.406-1.406 3.747-1.408 5.23.075 1.483 1.483 1.48 3.825.075 5.23l-3.46 3.461z"></path>
+      <path d="M14.012 16.69c1.406-1.405 3.747-1.407 5.23.076a1.25 1.25 0 001.768-1.768c-2.423-2.424-6.348-2.493-8.766-.076l-3.462 3.462c-2.418 2.418-2.348 6.343.076 8.766 2.423 2.424 6.349 2.494 8.767.076l.556-.557a1.25 1.25 0 00-1.768-1.768l-.557.556c-1.405 1.406-3.747 1.408-5.23-.075-1.483-1.483-1.48-3.824-.075-5.23l3.461-3.461z"></path>
+    </svg>
+  );
+}
+function IconLeaveConversation() {
+  return (
+    <svg
+      viewBox="0 0 36 36"
+      className="x1lliihq x1k90msu x2h7rmj x1qfuztq x19dipnz"
+      fill="currentColor"
+      height="24"
+      width="24"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path d="M21.498 14.75a1 1 0 001-1V12a4 4 0 00-4-4h-6.5a4 4 0 00-4 4v12a4 4 0 004 4h6.5a4 4 0 004-4v-1.75a1 1 0 00-1-1h-.5a1 1 0 00-1 1V24a1.5 1.5 0 01-1.5 1.5h-6.5a1.5 1.5 0 01-1.5-1.5V12a1.5 1.5 0 011.5-1.5h6.5a1.5 1.5 0 011.5 1.5v1.75a1 1 0 001 1h.5z"></path>
+      <path d="M14.498 16.75h9.752a.25.25 0 00.25-.25v-1.858a1 1 0 011.642-.766l4.002 3.356a1 1 0 010 1.532l-4.002 3.357a1 1 0 01-1.642-.767V19.5a.25.25 0 00-.25-.25h-9.752a1 1 0 01-1-1v-.5a1 1 0 011-1z"></path>
+    </svg>
+  );
+}
+function IconAddAdmin() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
+      overflow="visible"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.5 11.928c0-.568.32-1.091.84-1.318.809-.351 1.652-.655 2.529-.972 1.918-.692 4.001-1.444 6.247-2.88a1.644 1.644 0 0 1 1.768 0c2.246 1.436 4.329 2.188 6.247 2.88.877.317 1.72.621 2.529.973.52.226.84.75.84 1.318v.073C28.5 23 21 29 18 29S7.5 23 7.5 12.002v-.074zm11.154.297c-.206-.633-1.102-.633-1.308 0l-.878 2.704a.458.458 0 0 1-.436.317h-2.843c-.666 0-.943.852-.404 1.243l2.3 1.671c.16.117.228.324.166.513l-.878 2.704c-.206.633.519 1.16 1.058.768l2.3-1.671a.458.458 0 0 1 .538 0l2.3 1.671c.54.392 1.264-.135 1.058-.768l-.878-2.704a.458.458 0 0 1 .166-.513l2.3-1.67c.54-.392.262-1.244-.404-1.244h-2.843a.458.458 0 0 1-.436-.317l-.878-2.704z"
+      ></path>
+    </svg>
+  );
+}
+function IconRemoveMember() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
+      overflow="visible"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path d="M10.25 11.305C10.25 15.207 12.446 17 15 17s4.75-1.793 4.75-5.695C19.75 8.123 17.75 6 15 6s-4.75 2.123-4.75 5.305zM15.322 27c.742 0 1.235-.788 1.03-1.502A9.001 9.001 0 0 1 16 23a9 9 0 0 1 .384-2.61c.193-.637-.179-1.347-.844-1.378A11.79 11.79 0 0 0 15 19c-4.835 0-9 2.985-9 6.665C6 26.405 6.37 27 7.06 27h8.262z"></path>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M25 30a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm-4-8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-8z"
+      ></path>
+    </svg>
+  );
+}
 
 const CustomIcons = {
   icon_chat: IconChat,
@@ -520,5 +643,12 @@ const CustomIcons = {
   icon_add_image: IconAddImage,
   icon_friend_request: IconFriendRequest,
   icon_pinned_message: IconPinnedMessage,
+  icon_change_name_conversation: IconChangeNameConversation,
+  icon_change_avatar_conversation: IconChangeAvatarConversation,
+  icon_search_in_conversation: IconSearchInConversation,
+  icon_link: IconLink,
+  icon_leave_conversation: IconLeaveConversation,
+  icon_add_admin: IconAddAdmin,
+  icon_remove_member: IconRemoveMember,
 };
 export default CustomIcons;

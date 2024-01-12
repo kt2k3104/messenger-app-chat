@@ -6,6 +6,8 @@ export interface LogicState {
   setIsShowSidebarRight: (isShowSidebarRight: boolean) => void;
   isShowBoxNewConversation: boolean;
   setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) => void;
+  isShowBoxSearchMessage: boolean;
+  setIsShowBoxSearchMessage: (isShowBoxSearchMessage: boolean) => void;
   waitingForAddedToGroup: UserInfo[];
   setWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo[]) => void;
   pushWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo) => void;
@@ -20,6 +22,9 @@ const useLogic = create<LogicState>((set) => ({
   isShowBoxNewConversation: false,
   setIsShowBoxNewConversation: (isShowBoxNewConversation: boolean) =>
     set({ isShowBoxNewConversation }),
+  isShowBoxSearchMessage: false,
+  setIsShowBoxSearchMessage: (isShowBoxSearchMessage: boolean) =>
+    set({ isShowBoxSearchMessage }),
   setWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo[]) =>
     set({ waitingForAddedToGroup }),
   pushWaitingForAddedToGroup: (waitingForAddedToGroup: UserInfo) =>

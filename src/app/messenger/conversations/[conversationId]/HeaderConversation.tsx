@@ -4,7 +4,7 @@ import { Button, HStack, Img, Text } from "@chakra-ui/react";
 import CustomIcons from "~/app/components/Icon";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
+import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import ThumbConversation from "../components/ThumbConversation";
 
 export default function HeaderConversation() {
@@ -18,6 +18,9 @@ export default function HeaderConversation() {
   const setIsShowSidebarRight = useLogic(
     (state: LogicState) => state.setIsShowSidebarRight
   );
+  const isShowBoxSearchMessage = useLogic(
+    (state: LogicState) => state.isShowBoxSearchMessage
+  );
 
   return (
     <HStack
@@ -25,7 +28,9 @@ export default function HeaderConversation() {
       justifyContent="space-between"
       w="100%"
       h="56px"
-      boxShadow="0 0 4px rgba(0, 0, 0, 0.2)"
+      boxShadow={
+        isShowBoxSearchMessage ? "none" : "-3px 4px 3px -4px rgba(0, 0, 0, 0.2)"
+      }
     >
       <Button
         display={"flex"}
