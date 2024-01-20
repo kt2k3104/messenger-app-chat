@@ -65,6 +65,7 @@ export default function RootLayout({
       } catch (error) {
         console.log(error);
         localStorage.removeItem("accessToken");
+        router.push("/");
       }
     };
     initLogin();

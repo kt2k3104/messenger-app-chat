@@ -52,21 +52,30 @@ function MessageBox({
         message.type === MessageTypes.IMAGE) && (
         <>
           {message.sender._id === userId ? (
-            <VStack ml="auto">
-              <HStack>
+            <VStack ml="auto" mt={!isInBlock ? "10px" : "0"}>
+              <VStack>
                 {message.images?.length > 0 && (
                   <HStack>
                     {message.images.map((image) => {
                       return (
-                        <Box key={image}>
-                          <Img src={image} alt="img" w="50px" />
-                        </Box>
+                        <Img
+                          ml="auto"
+                          key={image}
+                          src={image}
+                          alt="img"
+                          maxH="200px"
+                          maxW="50%"
+                          h="auto"
+                          w="auto"
+                          borderRadius="5px"
+                        />
                       );
                     })}
                   </HStack>
                 )}
                 {message.content && (
                   <Text
+                    ml="auto"
                     h="35px"
                     p="8px 12px"
                     bgColor="primary.100"
@@ -76,7 +85,7 @@ function MessageBox({
                     {message.content}
                   </Text>
                 )}
-              </HStack>
+              </VStack>
               <AvatarGroup p="0" ml="auto" size="xs" max={4}>
                 {isLastMessage &&
                   message.seenUsers?.map((user) => {
@@ -104,7 +113,7 @@ function MessageBox({
               alignItems="start"
               gap="2px"
             >
-              <HStack gap="10px">
+              <HStack gap="10px" mt={!isInBlock ? "10px" : "0"}>
                 {isLastInBlock && (
                   <Tooltip
                     hasArrow
@@ -153,9 +162,16 @@ function MessageBox({
                     <HStack>
                       {message.images.map((image) => {
                         return (
-                          <Box key={image}>
-                            <Img src={image} alt="img" w="50px" />
-                          </Box>
+                          <Img
+                            key={image}
+                            src={image}
+                            alt="img"
+                            maxH="200px"
+                            maxW="50%"
+                            h="auto"
+                            w="auto"
+                            borderRadius="5px"
+                          />
                         );
                       })}
                     </HStack>

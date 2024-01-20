@@ -10,11 +10,21 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import Sidebar from "./Sidebar";
-import { use, useEffect } from "react";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import requestApi from "~/utils/api";
+import { useState } from "react";
 
-const ListFriends = () => {
+enum SentStatus {
+  CANCELLED = "cancelled",
+  PENDING = "pending",
+  STRANGE = "strange",
+}
+
+const SuggestionFriends = () => {
+  const [isSent, setIsSent] = useState(SentStatus.STRANGE);
+
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
+  const bgButtonDelete = useColorModeValue("#E4E6EB", "rgba(255,255,255,.1)");
   const strangeUsers = useUserInfo(
     (state: UserInfoState) => state.strangeUsers
   );
@@ -31,7 +41,7 @@ const ListFriends = () => {
             base: "repeat(2, 1fr)",
             lg: "repeat(3, 1fr)",
             xl: "repeat(4, 1fr)",
-            "2xl": "repeat(5, 1fr)",
+            // "2xl": "repeat(5, 1fr)",
           }}
           gap="16px"
           p="16px"
@@ -39,7 +49,6 @@ const ListFriends = () => {
           overflow="auto"
         >
           {strangeUsers?.map((user) => {
-            console.log(user);
             return (
               <Box
                 key={user._id}
@@ -63,33 +72,72 @@ const ListFriends = () => {
                   {user.lastName + " " + user.firstName}
                 </Text>
                 <Text fontSize="1.4rem" fontWeight="300" p="0 12px">
-                  {user.mutualFriends.length} bạn chung
+                  {isSent === SentStatus.PENDING
+                    ? "Đã gửi lời mời"
+                    : isSent === SentStatus.CANCELLED
+                    ? "Đã hủy lời mời"
+                    : `${user.mutualFriends.length} bạn chung`}
                 </Text>
-                <Button
-                  bgColor="#1D85FC33"
-                  borderRadius="5px"
-                  w="88%"
-                  h="36px"
-                  m="2px 12px 5px"
-                  p="12px"
-                  fontSize="1.4rem"
-                  onClick={() => {
-                    console.log("add friend");
-                  }}
-                >
-                  Thêm bạn bè
-                </Button>
-                <Button
-                  bgColor="rgba(255,255,255,.1)"
-                  borderRadius="5px"
-                  w="88%"
-                  h="36px"
-                  m="2px 12px 5px"
-                  p="12px"
-                  fontSize="1.4rem"
-                >
-                  Xóa
-                </Button>
+                {isSent === SentStatus.STRANGE ||
+                isSent === SentStatus.CANCELLED ? (
+                  <>
+                    <Button
+                      bgColor="primary.100"
+                      _hover={{
+                        bgColor: "primary.90",
+                      }}
+                      color="#fff"
+                      borderRadius="5px"
+                      w="88%"
+                      h="36px"
+                      m="2px 12px 5px"
+                      p="12px"
+                      fontSize="1.4rem"
+                      onClick={() => {
+                        const handleAddFriend = async () => {
+                          try {
+                            setIsSent(SentStatus.PENDING);
+                            await requestApi("users/add-friend", "POST", {
+                              userId: user._id,
+                            });
+                          } catch (error) {
+                            console.log(error);
+                            setIsSent(SentStatus.PENDING);
+                          }
+                        };
+                        handleAddFriend();
+                      }}
+                    >
+                      Thêm bạn bè
+                    </Button>
+                    <Button
+                      bgColor={bgButtonDelete}
+                      borderRadius="5px"
+                      w="88%"
+                      h="36px"
+                      m="2px 12px 5px"
+                      p="12px"
+                      fontSize="1.4rem"
+                    >
+                      Xóa
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    bgColor={bgButtonDelete}
+                    borderRadius="5px"
+                    w="88%"
+                    h="36px"
+                    m="2px 12px 5px"
+                    p="12px"
+                    fontSize="1.4rem"
+                    onClick={() => {
+                      setIsSent(SentStatus.CANCELLED);
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                )}
               </Box>
             );
           })}
@@ -98,4 +146,4 @@ const ListFriends = () => {
     </HStack>
   );
 };
-export default ListFriends;
+export default SuggestionFriends;

@@ -9,6 +9,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -20,8 +21,11 @@ function ModalUpdateAvatarConversation({
   conversationId,
 }: any) {
   const [image, setImage] = useState<any>(null);
+  const [spinner, setSpinner] = useState<boolean>(false);
+
   const handleSubmitUpdateAvatarConversation = async (e: any) => {
     e.preventDefault();
+    setSpinner(true);
     try {
       const formData = new FormData();
       formData.append("thumb", image);
@@ -31,6 +35,7 @@ function ModalUpdateAvatarConversation({
         formData
       );
       onCloseModalUpdateAvatarConversation();
+      setSpinner(false);
     } catch (error) {
       console.log(error);
     }
@@ -55,34 +60,48 @@ function ModalUpdateAvatarConversation({
           </Text>
         </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <form onSubmit={handleSubmitUpdateAvatarConversation}>
-            <Input
-              type="file"
-              onChange={(e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  setImage(e.target.files[0]);
-                }
-              }}
-              placeholder="Nhập tên cuộc trò chuyện"
-              fontSize="1.4rem"
-              fontWeight="500"
-              mb="20px"
+        <ModalBody display="flex" justifyContent="center">
+          {spinner ? (
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+              mt="10px"
             />
-            <Button
-              type="submit"
-              w="100%"
-              h="36px"
-              fontSize="1.4rem"
-              fontWeight="500"
-              colorScheme="blue"
-              bgColor="rgba(0, 0, 0, 0.04);"
-              color="textPrimary.100"
-              _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
+          ) : (
+            <form
+              onSubmit={handleSubmitUpdateAvatarConversation}
+              style={{ width: "100%" }}
             >
-              Cập nhật
-            </Button>
-          </form>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setImage(e.target.files[0]);
+                  }
+                }}
+                fontSize="1.4rem"
+                fontWeight="500"
+                mb="20px"
+              />
+              <Button
+                type="submit"
+                w="100%"
+                h="36px"
+                fontSize="1.4rem"
+                fontWeight="500"
+                colorScheme="blue"
+                bgColor="rgba(0, 0, 0, 0.04);"
+                color="textPrimary.100"
+                _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
+              >
+                Cập nhật
+              </Button>
+            </form>
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>

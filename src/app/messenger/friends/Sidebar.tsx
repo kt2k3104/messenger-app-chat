@@ -5,14 +5,6 @@ import {
   AvatarBadge,
   Box,
   Button,
-  HStack,
-  Img,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   Text,
   Tooltip,
   useColorModeValue,
@@ -21,22 +13,23 @@ import {
 import CustomIcons from "~/app/components/Icon";
 import useActiveList, { ActiveListStore } from "~/hooks/useActiveList";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import ModalFriendRequest from "./ModalFriendRequests";
 
 function Sidebar() {
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
+
   const {
     isOpen: isOpenModalFriendRequest,
     onOpen: onOpenModalFriendRequest,
     onClose: onCloseModalFriendRequest,
   } = useDisclosure();
-  const {
-    isOpen: isOpenModalInvitationSent,
-    onOpen: onOpenModalInvitationSent,
-    onClose: onCloseModalInvitationSent,
-  } = useDisclosure();
 
   const friends = useUserInfo((state: UserInfoState) => state.friends);
-  const friendActive = useActiveList((state: ActiveListStore) => state.members);
+  const friendRequests = useUserInfo(
+    (state: UserInfoState) => state.friendRequests
+  );
+  const userActive = useActiveList((state: ActiveListStore) => state.members);
+
   return (
     <Box
       position="relative"
@@ -54,7 +47,7 @@ function Sidebar() {
         borderRadius="8px"
         p="5px"
       >
-        <Button
+        <Avatar
           position="absolute"
           top="12px"
           right="12px"
@@ -63,164 +56,40 @@ function Sidebar() {
           p="0"
           borderRadius="50%"
           onClick={onOpenModalFriendRequest}
+          icon={<CustomIcons.icon_friend_request />}
+          cursor="pointer"
+          bgColor={bg}
         >
-          <CustomIcons.icon_friend_request />
-        </Button>
+          {friendRequests.length > 0 && (
+            <AvatarBadge
+              top="-3"
+              right="-1"
+              border="1px solid"
+              borderColor="papayawhip"
+              bg="tomato"
+              boxSize="1.25em"
+            >
+              {friendRequests.length}
+            </AvatarBadge>
+          )}
+        </Avatar>
       </Tooltip>
-      <Modal
-        isOpen={isOpenModalFriendRequest}
-        onClose={onCloseModalFriendRequest}
-      >
-        <ModalOverlay />
-        <ModalContent
-          maxW="50vw"
-          maxH="50vh"
-          w="548px"
-          h="440px"
-          borderRadius="10px"
-          mt="24vh"
-        >
-          <ModalHeader
-            fontSize="2rem"
-            textAlign="center"
-            borderBottom="1px solid"
-            borderColor={bg}
-          >
-            Lời mời kết bạn
-          </ModalHeader>
-          <ModalCloseButton
-            top="10px"
-            right="10px"
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            fontSize="1.2rem"
-          />
-          <ModalBody>
-            <Text
-              cursor="pointer"
-              fontSize="1.2rem"
-              fontWeight="300"
-              color="#0866FF"
-              onClick={() => {
-                onCloseModalFriendRequest();
-                onOpenModalInvitationSent();
-              }}
-            >
-              Xem lời mời đã gửi
-            </Text>
-            <Button
-              w="100%"
-              h="72px"
-              bgColor="transparent"
-              p="8px"
-              justifyContent="flex-start"
-              borderRadius="8px"
-            >
-              <Img
-                src="/images/no-image.png"
-                alt="avt"
-                w="60px"
-                h="60px"
-                borderRadius="50%"
-                mr="12px"
-              />
-              <Text>Nguyễn Văn A</Text>
-              <HStack ml="auto" fontSize="1.2rem">
-                <Button
-                  bgColor="#0866FF"
-                  color="#fff"
-                  fontSize="inherit"
-                  p="15px 20px"
-                  _hover={{
-                    bgColor: "#0866FF",
-                    opacity: "0.8",
-                  }}
-                >
-                  Xác nhận
-                </Button>
-                <Button
-                  fontSize="inherit"
-                  p="15px 20px"
-                  _hover={{ opacity: "0.8" }}
-                >
-                  Xóa
-                </Button>
-              </HStack>
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <Modal
-        isOpen={isOpenModalInvitationSent}
-        onClose={onCloseModalInvitationSent}
-      >
-        <ModalOverlay />
-        <ModalContent
-          maxW="50vw"
-          maxH="50vh"
-          w="548px"
-          h="440px"
-          borderRadius="10px"
-          mt="24vh"
-        >
-          <ModalHeader
-            fontSize="2rem"
-            textAlign="center"
-            borderBottom="1px solid"
-            borderColor={bg}
-          >
-            Lời mời đã gửi
-          </ModalHeader>
-          <ModalCloseButton
-            top="10px"
-            right="10px"
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            fontSize="1.2rem"
-          />
-          <ModalBody>
-            <Text fontSize="1.6rem" p="12px 16px">
-              0 lời mời đã gửi
-            </Text>
-            <Button
-              w="100%"
-              h="72px"
-              bgColor="transparent"
-              p="8px"
-              justifyContent="flex-start"
-              borderRadius="8px"
-            >
-              <Img
-                src="/images/no-image.png"
-                alt="avt"
-                w="60px"
-                h="60px"
-                borderRadius="50%"
-                mr="12px"
-              />
-              <Text>Nguyễn Văn A</Text>
-              <HStack ml="auto" fontSize="1.2rem">
-                <Button
-                  fontSize="1.4rem"
-                  h="36px"
-                  p="10px 36px"
-                  borderRadius="8px"
-                >
-                  Hủy yêu cầu
-                </Button>
-              </HStack>
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <ModalFriendRequest
+        isOpenModalFriendRequest={isOpenModalFriendRequest}
+        onOpenModalFriendRequest={onOpenModalFriendRequest}
+        onCloseModalFriendRequest={onCloseModalFriendRequest}
+      />
 
       <Text fontSize="2.4rem" fontWeight="700" m="12px 16px 4px">
         Danh sách bạn bè
       </Text>
       <Text fontSize="1.2rem" fontWeight="400" m="18px 15px">
-        Bạn bè đang hoạt động {`(${friendActive.length})`}
+        Bạn bè đang hoạt động{" "}
+        {`(${
+          friends.filter((user) => {
+            return userActive.filter((id: any) => id === user._id).length > 0;
+          }).length
+        })`}
       </Text>
       {friends.map((user) => {
         return (
@@ -234,8 +103,17 @@ function Sidebar() {
             bgColor="transparent"
             borderRadius="8px"
           >
-            <Avatar mt="auto" src={user.avatar} size="md" m="0">
-              {friendActive.findIndex((member) => {
+            <Avatar
+              mt="auto"
+              src={
+                user.avatar
+                  ? user.avatar
+                  : "https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
+              }
+              size="md"
+              m="0"
+            >
+              {userActive.findIndex((member) => {
                 return member === user._id;
               }) >= 0 && <AvatarBadge boxSize="1.2rem" bg="green.500" />}
             </Avatar>

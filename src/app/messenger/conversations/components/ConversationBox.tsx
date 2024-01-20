@@ -9,6 +9,23 @@ import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
 import ThumbConversation from "./ThumbConversation";
 import { useMemo } from "react";
 
+export const convertTime = (created_at: string) => {
+  const createdAtDate: Date = new Date(created_at);
+  const currentTime: Date = new Date();
+  const timeDifference = Number(currentTime) - Number(createdAtDate) + 4000;
+  const secondsDifference = Math.floor(timeDifference / 1000);
+  const minutesDifference = Math.floor(secondsDifference / 60);
+  const hoursDifference = Math.floor(minutesDifference / 60);
+  const daysDifference = Math.floor(hoursDifference / 24);
+
+  if (secondsDifference < 10) return "Vừa xong";
+  if (secondsDifference >= 10 && secondsDifference < 60)
+    return `${secondsDifference} giây`;
+  if (minutesDifference < 60) return `${minutesDifference} phút`;
+  if (hoursDifference < 24) return `${hoursDifference} giờ`;
+  if (daysDifference >= 1) return `${daysDifference} ngày`;
+};
+
 function ConversationBox({ conversation }: { conversation: Conversation }) {
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
@@ -26,22 +43,6 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
     (state: ConversationsState) => state.currConversation
   );
   const userId = useUserInfo((state: UserInfoState) => state.userInfo)?._id;
-  const convertTime = (created_at: string) => {
-    const createdAtDate: Date = new Date(created_at);
-    const currentTime: Date = new Date();
-    const timeDifference = Number(currentTime) - Number(createdAtDate) + 4000;
-    const secondsDifference = Math.floor(timeDifference / 1000);
-    const minutesDifference = Math.floor(secondsDifference / 60);
-    const hoursDifference = Math.floor(minutesDifference / 60);
-    const daysDifference = Math.floor(hoursDifference / 24);
-
-    if (secondsDifference < 10) return "Vừa xong";
-    if (secondsDifference >= 10 && secondsDifference < 60)
-      return `${secondsDifference} giây`;
-    if (minutesDifference < 60) return `${minutesDifference} phút`;
-    if (hoursDifference < 24) return `${hoursDifference} giờ`;
-    if (daysDifference >= 1) return `${daysDifference} ngày`;
-  };
   const lastMessage = conversation.messages[conversation.messages.length - 1];
 
   const checkSeenMessage = useMemo(() => {
@@ -52,6 +53,7 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
     return (
       lastMessage.seenUsers.findIndex((user) => user._id === userId) !== -1
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage]);
 
   return (

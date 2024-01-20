@@ -1,5 +1,14 @@
 "use client";
-import { Box, Button, HStack, Input, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Center,
+  HStack,
+  Input,
+  Text,
+  Tooltip,
+  VStack,
+} from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 
 import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
@@ -166,6 +175,12 @@ function ChatContent({ conversationId }: { conversationId: any }) {
                 isLastInBlock = true;
               }
             }
+            if (
+              array[index - 1]?.type !== MessageTypes.TEXT &&
+              array[index - 1]?.type !== MessageTypes.IMAGE
+            ) {
+              isInBlock = false;
+            }
           } else {
             flagUserId = message.sender._id;
 
@@ -207,12 +222,88 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           handleSubmitSendMessage(e);
         }}
         p="0 10px 0 5px"
+        gap="0"
       >
-        <Button w="36px" h="36px" borderRadius="50%" p="0" mt="auto" mb="12px">
-          <label htmlFor="image" style={{ cursor: "pointer" }}>
-            <CustomIcons.icon_send_image />
-          </label>
-        </Button>
+        <Tooltip
+          label="Mở hành động khác"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
+        >
+          <Button
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            mt="auto"
+            mb="12px"
+            bgColor="transparent"
+          >
+            <CustomIcons.icon_more />
+          </Button>
+        </Tooltip>
+        <Tooltip
+          label="Đính kèm file"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
+        >
+          <Button
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            mt="auto"
+            mb="12px"
+            bgColor="transparent"
+          >
+            <label htmlFor="image" style={{ cursor: "pointer" }}>
+              <CustomIcons.icon_send_image />
+            </label>
+          </Button>
+        </Tooltip>
+        <Tooltip
+          label="Chọn nhãn dán"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
+        >
+          <Button
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            mt="auto"
+            mb="12px"
+            bgColor="transparent"
+          >
+            <CustomIcons.icon_select_sticker />
+          </Button>
+        </Tooltip>
+        <Tooltip
+          label="Chọn file gif"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
+        >
+          <Button
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            mt="auto"
+            mb="12px"
+            mr="8px"
+            bgColor="transparent"
+          >
+            <CustomIcons.icon_select_gif_file />
+          </Button>
+        </Tooltip>
+
         <Input
           display="none"
           accept=".jpg, .png, .jpeg"
@@ -245,7 +336,6 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           >
             <Button w="48px" h="48px" borderRadius="10px" bgColor="#e4e6ea">
               <label htmlFor="image">
-                {" "}
                 <CustomIcons.icon_add_image />
               </label>
             </Button>
@@ -260,24 +350,38 @@ function ChatContent({ conversationId }: { conversationId: any }) {
                 );
               })}
           </HStack>
-          <Input
-            fontSize="1.4rem"
-            h="36px"
-            borderRadius="999px"
-            value={inputMessage}
-            placeholder="Aa"
-            bgColor="transparent"
-            outline="none"
-            border="none"
-            _focusVisible={{
-              outline: "none",
-            }}
-            onChange={(e) => {
-              setInputMessage(e.target.value);
-            }}
-          />
+          <HStack alignItems="center" justifyContent="space-between" h="36px">
+            <Input
+              fontSize="1.4rem"
+              borderRadius="999px"
+              value={inputMessage}
+              placeholder="Aa"
+              bgColor="transparent"
+              outline="none"
+              border="none"
+              _focusVisible={{
+                outline: "none",
+              }}
+              onChange={(e) => {
+                setInputMessage(e.target.value);
+              }}
+            />
+            <Button
+              flexShrink="0"
+              type="submit"
+              w="36px"
+              h="36px"
+              borderRadius="50%"
+              p="0"
+              mt="auto"
+              mb="12px"
+              bgColor="transparent"
+            >
+              <CustomIcons.icon_select_emoji />
+            </Button>
+          </HStack>
         </Box>
-        {(inputMessage !== "" || images.length !== 0) && (
+        {inputMessage !== "" || images.length !== 0 ? (
           <Button
             type="submit"
             w="36px"
@@ -286,8 +390,24 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             p="0"
             mt="auto"
             mb="12px"
+            ml="8px"
+            bgColor="transparent"
           >
             <CustomIcons.icon_send_message />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            mt="auto"
+            mb="12px"
+            ml="8px"
+            bgColor="transparent"
+          >
+            <CustomIcons.icon_like />
           </Button>
         )}
       </HStack>

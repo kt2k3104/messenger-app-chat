@@ -2,12 +2,13 @@
 import { IoMdArrowBack } from "react-icons/io";
 
 import {
+  Box,
   Button,
   Drawer,
   DrawerBody,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
+  Grid,
   Img,
   Tab,
   TabList,
@@ -90,8 +91,9 @@ function DrawerElement({
         bgColor={bgDrawer}
         maxW={{ base: "266px", xl: "384px" }}
         boxShadow="none"
+        h="100vh"
       >
-        <DrawerHeader display="flex" alignItems="center">
+        <DrawerHeader display="flex" alignItems="center" h="60px">
           <Button
             as="div"
             w="32px"
@@ -159,17 +161,23 @@ function DrawerElement({
               </Tab>
             </TabList>
             <TabPanels>
-              <TabPanel>
+              <TabPanel h="calc(100vh - 100px)" p="10px" overflow="auto">
                 {allImages.length === 0 && (
                   <Text fontSize="1.4rem" textAlign="center">
                     Không có hình ảnh hoặc video
                   </Text>
                 )}
-                {allImages.map((image) => (
-                  <div key={image.messageId}>
-                    <Img src={image.image} alt="img" />
-                  </div>
-                ))}
+                <Grid templateColumns="repeat(3, 1fr)" gap={3}>
+                  {allImages.map((image) => (
+                    <Img
+                      src={image.image}
+                      alt="img"
+                      key={image.messageId}
+                      w="100%"
+                      cursor="pointer"
+                    />
+                  ))}
+                </Grid>
               </TabPanel>
               <TabPanel>
                 <Text fontSize="1.4rem" textAlign="center">

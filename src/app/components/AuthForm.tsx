@@ -5,6 +5,7 @@ import {
   Checkbox,
   Input,
   Link,
+  Spinner,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -35,6 +36,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [spinner, setSpinner] = useState(false);
 
   const router = useRouter();
   const toast = useToast();
@@ -64,6 +66,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   } = useForm<Inputs>();
 
   const handleResgister: SubmitHandler<Inputs> = async (data) => {
+    setSpinner(true);
     if (data.password !== data.confirm_password) {
       toast({
         status: "error",
@@ -96,6 +99,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         setPassword("");
         setConfirmPassword("");
         reset();
+        setSpinner(false);
       }
     } catch (error) {
       console.log(error);
@@ -110,6 +114,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
 
   const handleLogin: SubmitHandler<Inputs> = async (data) => {
     try {
+      setSpinner(true);
       const { data: responseData } = await requestApi("auth/login", "POST", {
         email: data.email,
         password: data.password,
@@ -134,7 +139,6 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           displayName: usersData.metadata.displayName,
           email: usersData.metadata.email,
         });
-
         setFriends(usersData.metadata.friends);
         setFriendRequests(usersData.metadata.friendRequests);
         setStrangeUsers(usersData.metadata.strangers);
@@ -153,6 +157,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           window.location.href = "/messenger/conversations";
         }
       }
+      setSpinner(false);
     } catch (error) {
       console.log(error);
     }
@@ -165,113 +170,142 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           Đăng ký
         </Text>
       )}
-      <form
-        onSubmit={handleSubmit(
-          variant === "LOGIN" ? handleLogin : handleResgister
-        )}
-      >
-        {variant === Variant.REGISTER && (
-          <>
-            <Input
-              fontSize={"1.4rem"}
-              h={"42px"}
-              p={"0 16px"}
-              mb={"12px"}
-              placeholder="Họ"
-              {...register("lastName", {
-                required: true,
-                pattern: /^[A-Za-z]+$/i,
-              })}
-            />
-            <Input
-              fontSize={"1.4rem"}
-              h={"42px"}
-              p={"0 16px"}
-              mb={"12px"}
-              placeholder="Tên"
-              {...register("firstName", { required: true, maxLength: 20 })}
-            />
-          </>
-        )}
-        <Input
-          fontSize={"1.4rem"}
-          h={"42px"}
-          p={"0 16px"}
-          mb={"12px"}
-          type="email"
-          id="email"
-          value={email}
-          placeholder={
-            variant === Variant.LOGIN ? "Email hoặc số điện thoại" : "Email"
-          }
-          {...register("email", {
-            required: true,
-            pattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/i,
-          })}
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
-        />
-        <Input
-          fontSize={"1.4rem"}
-          h={"42px"}
-          p={"0 16px"}
-          mb={"12px"}
-          type="password"
-          id="password"
-          placeholder="Mật khẩu"
-          value={password}
-          {...register("password", { required: true, minLength: 6 })}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-        {variant === Variant.REGISTER && (
+      {spinner ? (
+        <Box w="100%" textAlign="center">
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="primary.100"
+            size="xl"
+          />
+        </Box>
+      ) : (
+        <form
+          onSubmit={handleSubmit(
+            variant === "LOGIN" ? handleLogin : handleResgister
+          )}
+        >
+          {variant === Variant.REGISTER && (
+            <>
+              <Input
+                fontSize={"1.4rem"}
+                h={"42px"}
+                p={"0 16px"}
+                mb={"12px"}
+                placeholder="Họ"
+                {...register("lastName", {
+                  required: true,
+                  pattern: /^[A-Za-z]+$/i,
+                })}
+              />
+              <Input
+                fontSize={"1.4rem"}
+                h={"42px"}
+                p={"0 16px"}
+                mb={"12px"}
+                placeholder="Tên"
+                {...register("firstName", { required: true, maxLength: 20 })}
+              />
+            </>
+          )}
+          <Input
+            fontSize={"1.4rem"}
+            h={"42px"}
+            p={"0 16px"}
+            mb={"12px"}
+            type="email"
+            id="email"
+            value={email}
+            placeholder={
+              variant === Variant.LOGIN ? "Email hoặc số điện thoại" : "Email"
+            }
+            {...register("email", {
+              required: true,
+              pattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/i,
+            })}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(
+                  variant === Variant.LOGIN ? handleLogin : handleResgister
+                );
+              }
+            }}
+          />
           <Input
             fontSize={"1.4rem"}
             h={"42px"}
             p={"0 16px"}
             mb={"12px"}
             type="password"
-            id="confirm_password"
-            placeholder="Mật khẩu nhập lại"
-            value={confirmPassword}
-            {...register("confirm_password", { required: true, minLength: 6 })}
+            id="password"
+            placeholder="Mật khẩu"
+            value={password}
+            {...register("password", { required: true, minLength: 6 })}
             onChange={(e) => {
-              setConfirmPassword(e.target.value);
+              setPassword(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(
+                  variant === Variant.LOGIN ? handleLogin : handleResgister
+                );
+              }
             }}
           />
-        )}
-        <Button
-          fontSize={"1.4rem"}
-          type="submit"
-          colorScheme="blue"
-          display={"flex"}
-          m={"0 auto"}
-        >
-          Tiếp tục
-        </Button>
-        {variant === Variant.LOGIN && (
-          <Box display={"flex"} justifyContent={"center"} mt={"30px"}>
-            <Checkbox>Duy trì đăng nhập</Checkbox>
-          </Box>
-        )}
-        {variant === Variant.REGISTER && (
-          <Link
+          {variant === Variant.REGISTER && (
+            <Input
+              fontSize={"1.4rem"}
+              h={"42px"}
+              p={"0 16px"}
+              mb={"12px"}
+              type="password"
+              id="confirm_password"
+              placeholder="Mật khẩu nhập lại"
+              value={confirmPassword}
+              {...register("confirm_password", {
+                required: true,
+                minLength: 6,
+              })}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }}
+            />
+          )}
+          <Button
+            fontSize={"1.4rem"}
+            type="submit"
+            colorScheme="blue"
             display={"flex"}
-            justifyContent={"flex-end"}
-            mt={"10px"}
-            onClick={() => {
-              setConfirmPassword("");
-              setEmail("");
-              setPassword("");
-              setVariant(Variant.LOGIN);
-            }}
+            m={"0 auto"}
           >
-            Quay lại đăng nhập
-          </Link>
-        )}
-      </form>
+            Tiếp tục
+          </Button>
+          {variant === Variant.LOGIN && (
+            <Box display={"flex"} justifyContent={"center"} mt={"30px"}>
+              <Checkbox>Duy trì đăng nhập</Checkbox>
+            </Box>
+          )}
+          {variant === Variant.REGISTER && (
+            <Link
+              display={"flex"}
+              justifyContent={"flex-end"}
+              mt={"10px"}
+              onClick={() => {
+                setConfirmPassword("");
+                setEmail("");
+                setPassword("");
+                setVariant(Variant.LOGIN);
+              }}
+            >
+              Quay lại đăng nhập
+            </Link>
+          )}
+        </form>
+      )}
     </Box>
   );
 };

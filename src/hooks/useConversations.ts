@@ -43,6 +43,22 @@ const useConversations = create<ConversationsState>((set) => ({
           } as Conversation,
         };
       }
+      if (data.tag === ConversationTag.UPDATE_THUMB) {
+        return {
+          currConversation: {
+            ...state.currConversation,
+            thumb: data.imageUrl,
+          } as Conversation,
+        };
+      }
+      if (data.tag === ConversationTag.UPDATE_INFO) {
+        return {
+          currConversation: {
+            ...state.currConversation,
+            name: data.updateInfo.name,
+          } as Conversation,
+        };
+      }
 
       return { currConversation: state.currConversation };
     });
@@ -77,12 +93,30 @@ const useConversations = create<ConversationsState>((set) => ({
           conversation._id === data.conversationId &&
           data.tag === ConversationTag.ADD_MEMBERS
         ) {
-          console.log(data.members);
           return {
             ...conversation,
             members: data.members,
           };
         }
+        if (
+          conversation._id === data.conversationId &&
+          data.tag === ConversationTag.UPDATE_THUMB
+        ) {
+          return {
+            ...conversation,
+            thumb: data.imageUrl,
+          };
+        }
+        if (
+          conversation._id === data.conversationId &&
+          data.tag === ConversationTag.UPDATE_INFO
+        ) {
+          return {
+            ...conversation,
+            name: data.updateInfo.name,
+          };
+        }
+
         return conversation;
       }),
     }));

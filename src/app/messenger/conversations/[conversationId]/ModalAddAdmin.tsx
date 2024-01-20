@@ -79,6 +79,7 @@ function ModalAddAdmin({
             fontWeight="500"
             cursor="pointer"
             onClick={() => {
+              console.log(conversationId, userId, userName);
               try {
                 requestApi(
                   `conversations/add-admin/${conversationId}`,

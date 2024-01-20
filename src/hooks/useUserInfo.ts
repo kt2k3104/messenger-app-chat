@@ -37,7 +37,7 @@ export type StrangeUserInfo = UserInfo & {
 
 export interface Conversation {
   _id: string;
-  admin: string[];
+  admins: string[];
   members: UserInfo[];
   messages: Message[];
   name: string;
