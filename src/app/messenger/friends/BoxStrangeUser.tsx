@@ -2,9 +2,15 @@
 
 import { Box, Button, Img, Text, useColorModeValue } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { SentStatus } from "./page";
 import requestApi from "~/utils/api";
 import useUserInfo, { SentRequest, UserInfoState } from "~/hooks/useUserInfo";
+
+enum SentStatus {
+  CANCELLED = "cancelled",
+  PENDING = "pending",
+  STRANGE = "strange",
+  MYPENDING = "mypending",
+}
 
 function BoxStrangeUser({ user, sentStatus }: any) {
   const [isSent, setIsSent] = useState(sentStatus);

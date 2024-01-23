@@ -6,7 +6,7 @@ import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import BoxStrangeUser from "./BoxStrangeUser";
 import { stat } from "fs";
 
-export enum SentStatus {
+enum SentStatus {
   CANCELLED = "cancelled",
   PENDING = "pending",
   STRANGE = "strange",
