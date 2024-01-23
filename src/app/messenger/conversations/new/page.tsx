@@ -137,6 +137,7 @@ function New() {
             borderRadius="10px"
             bgColor={bg}
             p="6px"
+            overflowY="auto"
           >
             {showResults?.map((user: any) => {
               return (

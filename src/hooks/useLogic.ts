@@ -1,7 +1,9 @@
 import { create } from "zustand";
-import { UserInfo } from "./useUserInfo";
+import { Message, UserInfo } from "./useUserInfo";
 
 export interface LogicState {
+  notSeenMessage: Message[];
+  setNotSeenMessage: (notSeenMessage: Message[]) => void;
   isShowSidebarRight: boolean;
   setIsShowSidebarRight: (isShowSidebarRight: boolean) => void;
   isShowBoxNewConversation: boolean;
@@ -40,6 +42,8 @@ const useLogic = create<LogicState>((set) => ({
         (user) => user._id !== removedToqueue._id
       ),
     })),
+  notSeenMessage: [],
+  setNotSeenMessage: (notSeenMessage: Message[]) => set({ notSeenMessage }),
 }));
 
 export default useLogic;

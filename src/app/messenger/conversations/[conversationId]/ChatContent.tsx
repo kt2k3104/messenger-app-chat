@@ -200,11 +200,24 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             }
           }
 
+          const checkIsLastMessage = (i: number, arr: Message[]) => {
+            let c = arr.length;
+            while (
+              arr[c - 1].type !== MessageTypes.TEXT &&
+              arr[c - 1].type !== MessageTypes.IMAGE
+            ) {
+              c--;
+            }
+            if (i === c - 1) return true;
+            else return false;
+          };
+
           return (
             <HStack key={message._id} w="100%" justifyContent="center">
               <MessageBox
                 message={message}
-                isLastMessage={index === messages.length - 1 ? true : false}
+                // isLastMessage={index === messages.length - 1 ? true : false}
+                isLastMessage={checkIsLastMessage(index, array)}
                 isInBlock={isInBlock}
                 isLastInBlock={isLastInBlock}
               />

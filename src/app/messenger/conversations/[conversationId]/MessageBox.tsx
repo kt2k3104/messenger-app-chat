@@ -3,7 +3,6 @@ import {
   Avatar,
   AvatarBadge,
   AvatarGroup,
-  Box,
   HStack,
   Img,
   Text,
@@ -13,6 +12,7 @@ import {
 import useActiveList, { ActiveListStore } from "~/hooks/useActiveList";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
+import { formatDate } from "./BoxSearchMessage";
 
 interface IMessageBoxProps {
   message: Message;
@@ -74,21 +74,29 @@ function MessageBox({
                   </HStack>
                 )}
                 {message.content && (
-                  <Text
-                    ml="auto"
-                    h="35px"
-                    p="8px 12px"
-                    bgColor="primary.100"
-                    borderRadius="999px"
-                    color="#fff"
+                  <Tooltip
+                    hasArrow
+                    label={formatDate(message.createdAt)}
+                    placement="left"
+                    borderRadius="5px"
                   >
-                    {message.content}
-                  </Text>
+                    <Text
+                      ml="auto"
+                      h="35px"
+                      p="8px 12px"
+                      bgColor="primary.100"
+                      borderRadius="999px"
+                      color="#fff"
+                    >
+                      {message.content}
+                    </Text>
+                  </Tooltip>
                 )}
               </VStack>
               <AvatarGroup p="0" ml="auto" size="xs" max={4}>
                 {isLastMessage &&
-                  message.seenUsers?.map((user) => {
+                  message.seenUsers?.map((user, index) => {
+                    if (user._id === message.seenUsers[index + 1]?._id) return;
                     return (
                       <Tooltip
                         hasArrow
@@ -148,15 +156,22 @@ function MessageBox({
                     </Text>
                   )}
                   {message.content && (
-                    <Text
-                      h="35px"
-                      p="8px 12px"
-                      bgColor="primary.100"
-                      borderRadius="999px"
-                      color="#fff"
+                    <Tooltip
+                      hasArrow
+                      label={formatDate(message.createdAt)}
+                      placement="right"
+                      borderRadius="5px"
                     >
-                      {message.content}
-                    </Text>
+                      <Text
+                        h="35px"
+                        p="8px 12px"
+                        bgColor="primary.100"
+                        borderRadius="999px"
+                        color="#fff"
+                      >
+                        {message.content}
+                      </Text>
+                    </Tooltip>
                   )}
                   {message.images?.length > 0 && (
                     <HStack>
@@ -178,9 +193,11 @@ function MessageBox({
                   )}
                 </VStack>
               </HStack>
-              <AvatarGroup p="0" ml="auto" size="xs" max={4}>
+              <AvatarGroup p="0" ml="auto" size="xs" max={4} gap="2px">
                 {isLastMessage &&
                   message.seenUsers?.map((user) => {
+                    if (user._id === userId && !currConversation?.isGroup)
+                      return;
                     return (
                       <Tooltip
                         hasArrow

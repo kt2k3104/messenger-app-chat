@@ -28,6 +28,9 @@ export default function RootLayout({
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
+  const setSentRequests = useUserInfo(
+    (state: UserInfoState) => state.setSentRequests
+  );
 
   const router = useRouter();
 
@@ -48,6 +51,7 @@ export default function RootLayout({
           });
           setFriends(usersData.metadata.friends);
           setFriendRequests(usersData.metadata.friendRequests);
+          setSentRequests(usersData.metadata.sentRequests);
           setStrangeUsers(usersData.metadata.strangers);
           const { data: conversationsData } = await requestApi(
             "conversations",
@@ -58,9 +62,9 @@ export default function RootLayout({
           conversationsData.metadata[0] &&
             setCurrConversation(conversationsData.metadata[0]);
 
-          router.push(
-            "/messenger/conversations/" + conversationsData.metadata[0]._id
-          );
+          // router.push(
+          //   "/messenger/conversations/" + conversationsData.metadata[0]._id
+          // );
         }
       } catch (error) {
         console.log(error);

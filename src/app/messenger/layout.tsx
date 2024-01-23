@@ -1,5 +1,7 @@
 "use client";
 import {
+  Avatar,
+  AvatarBadge,
   Box,
   Button,
   HStack,
@@ -12,10 +14,15 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import CustomIcons from "../components/Icon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import ModalPerInfo from "../components/ModalPerInfo";
+import usePusher, { PusherState } from "~/hooks/usePusher";
+import requestApi from "~/utils/api";
+import useLogic, { LogicState } from "~/hooks/useLogic";
+import { usePathname } from "next/navigation";
+import { fr } from "date-fns/locale";
 
 export default function RootLayout({
   children,
@@ -23,19 +30,61 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [NumOfNotSeenMessage, setNumOfNotSeenMessage] = useState(0);
 
   const user = useUserInfo((state: UserInfoState) => state.userInfo);
   const { colorMode, toggleColorMode } = useColorMode();
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const setNotSeenMessage = useLogic(
+    (state: LogicState) => state.setNotSeenMessage
+  );
+  const friendRequests = useUserInfo(
+    (state: UserInfoState) => state.friendRequests
+  );
+  const setFriendRequests = useUserInfo(
+    (state: UserInfoState) => state.setFriendRequests
+  );
+  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
+  const userId = user?._id;
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
+  const colorIcon = useColorModeValue("black", "#fff");
+  const pathname = usePathname();
+
   const {
     isOpen: isOpenModalPerInfo,
     onOpen: onOpenModalPerInfo,
     onClose: onCloseModalPerInfo,
   } = useDisclosure();
+
+  useEffect(() => {
+    if (!pusherClient || !userId) return;
+    const channel = pusherClient.subscribe(userId);
+
+    channel.bind("friend:request", (data: any) => {
+      setFriendRequests([...friendRequests, data.userInfo]);
+    });
+
+    return () => {
+      pusherClient.unsubscribe(userId);
+      channel.unbind_all();
+    };
+  }, [pusherClient, userId, friendRequests, setFriendRequests]);
+
+  useEffect(() => {
+    const callApi = async () => {
+      const res: any = await requestApi(
+        "conversations/not-seen/message",
+        "GET",
+        {}
+      );
+      setNumOfNotSeenMessage(res.data.metadata.length);
+      setNotSeenMessage(res.data.metadata);
+    };
+    callApi();
+  }, [setNotSeenMessage]);
 
   return (
     <HStack position="relative" gap="0" h="100vh" w="100vw" overflow="hidden">
@@ -49,69 +98,127 @@ export default function RootLayout({
         <Link
           href={
             currConversation
-              ? `/messenger/conversations/${currConversation?._id}`
+              ? `/messenger/conversations/${currConversation._id}`
               : "/messenger/conversations"
           }
           passHref={true}
         >
-          <Button
+          <Avatar
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
             h="44px"
             justifyContent={expanded ? "flex-start" : "center"}
             p={expanded ? "0 11px" : ""}
+            icon={<CustomIcons.icon_chat />}
+            bgColor={
+              pathname.split("/")[2] === `conversations` ? bg : "transparent"
+            }
+            color={colorIcon}
           >
-            <CustomIcons.icon_chat />
-            {expanded && <Text ml="10px">Đoạn chat</Text>}
-          </Button>
+            {expanded && (
+              <Text ml="10px" textTransform="none">
+                Đoạn chat
+              </Text>
+            )}
+            {NumOfNotSeenMessage > 0 && (
+              <AvatarBadge
+                top="-3"
+                right="-1"
+                border="1px solid"
+                borderColor="papayawhip"
+                bg="tomato"
+                boxSize="1.25em"
+              >
+                {NumOfNotSeenMessage}
+              </AvatarBadge>
+            )}
+          </Avatar>
         </Link>
         <Link href={"/messenger/friends"} passHref={true}>
-          <Button
+          <Avatar
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
             h="44px"
             justifyContent={expanded ? "flex-start" : "center"}
             p={expanded ? "0 11px" : ""}
+            icon={<CustomIcons.icon_users />}
+            bgColor={pathname === `/messenger/friends` ? bg : "transparent"}
+            color={colorIcon}
           >
-            <CustomIcons.icon_users />
-            {expanded && <Text ml="10px">Mọi người</Text>}
-          </Button>
+            {expanded && (
+              <Text ml="10px" textTransform="none">
+                Mọi người
+              </Text>
+            )}
+            {friendRequests.length > 0 && (
+              <AvatarBadge
+                top="-3"
+                right="-1"
+                border="1px solid"
+                borderColor="papayawhip"
+                bg="tomato"
+                boxSize="1.25em"
+              >
+                {friendRequests.length}
+              </AvatarBadge>
+            )}
+          </Avatar>
         </Link>
         <Link href={""}>
-          <Button
+          <Avatar
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
             h="44px"
             justifyContent={expanded ? "flex-start" : "center"}
             p={expanded ? "0 11px" : ""}
+            icon={<CustomIcons.icon_market />}
+            bgColor={pathname === `/messenger/marketplace` ? bg : "transparent"}
+            color={colorIcon}
           >
-            <CustomIcons.icon_market />
-            {expanded && <Text ml="10px">Marketplace</Text>}
-          </Button>
+            {expanded && (
+              <Text ml="10px" textTransform="none">
+                Marketplace
+              </Text>
+            )}
+          </Avatar>
         </Link>
         <Link href={""}>
-          <Button
+          <Avatar
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
             h="44px"
             justifyContent={expanded ? "flex-start" : "center"}
             p={expanded ? "0 11px" : ""}
+            icon={<CustomIcons.icon_message_waiting />}
+            bgColor={
+              pathname === `/messenger/waittingMessages` ? bg : "transparent"
+            }
+            color={colorIcon}
           >
-            <CustomIcons.icon_message_waiting />
-            {expanded && <Text ml="10px">Tin nhắn đang chờ</Text>}
-          </Button>
+            {expanded && (
+              <Text ml="10px" textTransform="none">
+                Tin nhắn đang chờ
+              </Text>
+            )}
+          </Avatar>
         </Link>
         <Link href={""}>
-          <Button
+          <Avatar
             borderRadius="8px"
             w={expanded ? "230px" : "44px"}
             h="44px"
             justifyContent={expanded ? "flex-start" : "center"}
             p={expanded ? "0 11px" : ""}
+            icon={<CustomIcons.icon_archived_chat />}
+            bgColor={pathname === `/messenger/archive` ? bg : "transparent"}
+            color={colorIcon}
           >
-            <CustomIcons.icon_archived_chat />
-            {expanded && <Text ml="10px">Kho lưu trữ</Text>}
-          </Button>
+            {expanded && (
+              <Text ml="10px" textTransform="none">
+                Kho lưu trữ
+              </Text>
+            )}
+          </Avatar>
         </Link>
         {!expanded && <Box h="1px" w="55%" mt="20px" bgColor={bg}></Box>}
         <Box

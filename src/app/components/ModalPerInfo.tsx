@@ -48,11 +48,12 @@ function ModalPerInfo({
   onCloseModalPerInfo: () => void;
 }) {
   const userInfo = useUserInfo((state: UserInfoState) => state.userInfo);
+  const setUserInfo = useUserInfo((state: UserInfoState) => state.setUserInfo);
+
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<any>();
-  const router = useRouter();
 
   const {
     register,
@@ -181,7 +182,13 @@ function ModalPerInfo({
                         "POST",
                         formData
                       );
-                      console.log(response);
+                      e.target.value = "";
+                      if (userInfo) {
+                        setUserInfo({
+                          ...userInfo,
+                          avatar: response.data.metadata.url,
+                        });
+                      }
                     }
                   } catch (error) {
                     console.log(error);

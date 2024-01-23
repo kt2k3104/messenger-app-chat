@@ -70,8 +70,7 @@ const useConversations = create<ConversationsState>((set) => ({
           conversation._id === data.conversationId &&
           data.tag === ConversationTag.SEEN
         ) {
-          conversation.messages[conversation.messages.length - 1] =
-            data.lastMessage;
+          conversation.messages[0] = data.lastMessage;
           return {
             ...conversation,
             messages: conversation.messages,
@@ -85,7 +84,7 @@ const useConversations = create<ConversationsState>((set) => ({
           return {
             ...conversation,
             lastMessageAt: data.lastMessage.createdAt,
-            messages: [...conversation.messages, data.lastMessage],
+            messages: [data.lastMessage, ...conversation.messages],
           };
         }
 

@@ -55,6 +55,9 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
+  const setSentRequests = useUserInfo(
+    (state: UserInfoState) => state.setSentRequests
+  );
 
   const {
     register,
@@ -141,6 +144,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         });
         setFriends(usersData.metadata.friends);
         setFriendRequests(usersData.metadata.friendRequests);
+        setSentRequests(usersData.metadata.sentRequests);
         setStrangeUsers(usersData.metadata.strangers);
 
         const { data: conversationsData } = await requestApi(
@@ -158,8 +162,26 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         }
       }
       setSpinner(false);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      if (error.response.data.message === "Email is not registred.") {
+        toast({
+          status: "error",
+          position: "top",
+          title: `Email không tồn tại`,
+          duration: 3000,
+        });
+        setSpinner(false);
+      }
+      if (error.response.data.message === "Password is not correct") {
+        toast({
+          status: "error",
+          position: "top",
+          title: `Mật khẩu không đúng`,
+          duration: 3000,
+        });
+        setSpinner(false);
+      }
     }
   };
 

@@ -196,13 +196,13 @@ function IconCall() {
   );
 }
 
-function IconVideoCall() {
+function IconVideoCall({ width = "20px", height = "20px" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
       fill="currentColor"
-      width="20"
-      height="20"
+      width={width}
+      height={height}
       className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
       overflow="visible"
       style={{ color: "var(--primary-icon)" }}
@@ -801,6 +801,40 @@ function IconManageMessageSendingActivities() {
     ></i>
   );
 }
+function IconTick() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
+      overflow="visible"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M26.378 9.17c.597.346.8 1.11.453 1.708l-9 15.5a1.25 1.25 0 0 1-1.965.256l-6.5-6.5a1.25 1.25 0 0 1 1.768-1.768l5.121 5.122a.25.25 0 0 0 .393-.052L24.67 9.623a1.25 1.25 0 0 1 1.709-.454z"
+      ></path>
+    </svg>
+  );
+}
+function IconTrashCan() {
+  return (
+    <svg
+      viewBox="6 6 24 24"
+      fill="currentColor"
+      width="16"
+      height="16"
+      className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
+      overflow="visible"
+      style={{ color: "var(--primary-icon)" }}
+    >
+      <path d="M20.882 7c.685 0 1.312.387 1.618 1 .306.613.933 1 1.618 1H27a1 1 0 0 1 1 1v.5a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h2.882c.685 0 1.312-.387 1.618-1 .306-.613.933-1 1.618-1h5.764zM10.601 13.5a1 1 0 0 0-.995 1.096l1.132 11.693A3 3 0 0 0 13.724 29h8.552a3 3 0 0 0 2.986-2.711l1.132-11.693a1 1 0 0 0-.995-1.096H10.6z"></path>
+    </svg>
+  );
+}
 
 const CustomIcons = {
   icon_chat: IconChat,
@@ -848,5 +882,7 @@ const CustomIcons = {
   icon_active_status: IconActiveStatus,
   icon_payment_management: IconPaymentManagement,
   icon_manage_message_sending_activities: IconManageMessageSendingActivities,
+  icon_tick: IconTick,
+  icon_trash_can: IconTrashCan,
 };
 export default CustomIcons;

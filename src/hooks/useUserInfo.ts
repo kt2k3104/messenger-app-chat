@@ -5,6 +5,8 @@ export interface UserInfoState {
   friends: UserInfo[];
   friendRequests: FriendRequest[];
   strangeUsers: StrangeUserInfo[];
+  sentRequests: SentRequest[];
+  setSentRequests: (sentRequest: SentRequest[]) => void;
   setStrangeUsers: (strangeUsers: StrangeUserInfo[]) => void;
   setFriendRequests: (friendRequests: FriendRequest[]) => void;
   setUserInfo: (UserInfo: UserInfo) => void;
@@ -16,23 +18,24 @@ export interface UserInfo {
   avatar: string;
   email: string;
   firstName: string;
-  // friends: BasicUserInfo[];
-  // friendRequests: FriendRequest[];
   lastName: string;
   _id: string;
 }
 
-// export type BasicUserInfo = Omit<UserInfo, "friends" | "friendRequests">;
-
 export type FriendRequest = {
   sender: UserInfo;
   message: string;
-  _id: string;
   createdAt: string;
 };
 
 export type StrangeUserInfo = UserInfo & {
   mutualFriends: UserInfo[];
+};
+
+export type SentRequest = {
+  receiver: UserInfo;
+  message: string;
+  createdAt: string;
 };
 
 export interface Conversation {
@@ -67,6 +70,8 @@ const useUserInfo = create<UserInfoState>((set) => ({
   friends: [],
   friendRequests: [],
   strangeUsers: [],
+  sentRequests: [],
+  setSentRequests: (sentRequests: SentRequest[]) => set({ sentRequests }),
   setStrangeUsers: (strangeUsers: StrangeUserInfo[]) => set({ strangeUsers }),
   setFriendRequests: (friendRequests: FriendRequest[]) =>
     set({ friendRequests }),

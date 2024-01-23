@@ -15,10 +15,17 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import { set } from "lodash";
-import { useState } from "react";
-import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import { useEffect, useState } from "react";
+import usePusher, { PusherState } from "~/hooks/usePusher";
+import useUserInfo, { SentRequest, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
+
+enum FriendTag {
+  ADD_FRIEND = "add-friend",
+  ACCEPT_FRIEND_REQUEST = "accept-friend-request",
+  REMOVE_FRIEND = "remove-friend",
+  CANCEL_FRIEND_REQUEST = "cancel-friend-request",
+}
 
 function ModalFriendRequest({
   isOpenModalFriendRequest,
@@ -31,12 +38,19 @@ function ModalFriendRequest({
   const setFriendRequests = useUserInfo(
     (state: UserInfoState) => state.setFriendRequests
   );
+  const friends = useUserInfo((state: UserInfoState) => state.friends);
   const setFriends = useUserInfo((state: UserInfoState) => state.setFriends);
   const strangeUsers = useUserInfo(
     (state: UserInfoState) => state.strangeUsers
   );
   const setStrangeUsers = useUserInfo(
     (state: UserInfoState) => state.setStrangeUsers
+  );
+  const sentRequests = useUserInfo(
+    (state: UserInfoState) => state.sentRequests
+  );
+  const setSentRequests = useUserInfo(
+    (state: UserInfoState) => state.setSentRequests
   );
 
   const [loading, setLoading] = useState(false);
@@ -48,6 +62,24 @@ function ModalFriendRequest({
     onOpen: onOpenModalInvitationSent,
     onClose: onCloseModalInvitationSent,
   } = useDisclosure();
+
+  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
+  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
+
+  useEffect(() => {
+    if (!pusherClient || !userId) return;
+    const channel = pusherClient.subscribe(userId);
+
+    channel.bind("friend:request", (data: any) => {
+      console.log(data);
+      // setFriendRequests((prev: any) => [...prev, data]);
+    });
+
+    return () => {
+      pusherClient.unsubscribe(userId);
+      channel.unbind_all();
+    };
+  }, [pusherClient, userId]);
 
   return (
     <>
@@ -150,11 +182,6 @@ function ModalFriendRequest({
                                     userId: request.sender._id,
                                   }
                                 );
-                                const { data: usersData } = await requestApi(
-                                  "users/me",
-                                  "GET",
-                                  null
-                                );
                                 setFriendRequests(
                                   friendRequests.filter(
                                     (val) =>
@@ -166,7 +193,7 @@ function ModalFriendRequest({
                                     return val._id !== request.sender._id;
                                   })
                                 );
-                                setFriends(usersData.metadata.friends);
+                                setFriends([...friends, request.sender]);
                                 onCloseModalFriendRequest();
                                 setLoading(false);
                               };
@@ -245,36 +272,66 @@ function ModalFriendRequest({
           />
           <ModalBody>
             <Text fontSize="1.6rem" p="12px 16px">
-              0 lời mời đã gửi
+              {sentRequests?.length} lời mời đã gửi
             </Text>
-            <Button
-              w="100%"
-              h="72px"
-              bgColor="transparent"
-              p="8px"
-              justifyContent="flex-start"
-              borderRadius="8px"
-            >
-              <Img
-                src="https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
-                alt="avt"
-                w="60px"
-                h="60px"
-                borderRadius="50%"
-                mr="12px"
-              />
-              <Text>Nguyễn Văn A</Text>
-              <HStack ml="auto" fontSize="1.2rem">
-                <Button
-                  fontSize="1.4rem"
-                  h="36px"
-                  p="10px 36px"
-                  borderRadius="8px"
-                >
-                  Hủy yêu cầu
-                </Button>
-              </HStack>
-            </Button>
+            {sentRequests?.length > 0 &&
+              sentRequests.map((request: SentRequest) => {
+                return (
+                  <Button
+                    key={request.receiver._id}
+                    as="div"
+                    w="100%"
+                    h="72px"
+                    bgColor="transparent"
+                    p="8px"
+                    justifyContent="flex-start"
+                    borderRadius="8px"
+                  >
+                    <Img
+                      src={
+                        request.receiver.avatar
+                          ? request.receiver.avatar
+                          : "https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
+                      }
+                      alt="avt"
+                      w="60px"
+                      h="60px"
+                      borderRadius="50%"
+                      mr="12px"
+                    />
+                    <Text>{request.receiver.displayName}</Text>
+                    <HStack ml="auto" fontSize="1.2rem">
+                      <Button
+                        fontSize="1.4rem"
+                        h="36px"
+                        p="10px 36px"
+                        borderRadius="8px"
+                        onClick={() => {
+                          const handleCancelSentRequest = async () => {
+                            setSentRequests(
+                              sentRequests.filter(
+                                (val) =>
+                                  val.receiver._id !== request.receiver._id
+                              )
+                            );
+                            const response = await requestApi(
+                              "users/cancel-friend",
+                              "POST",
+                              {
+                                userId: request.receiver._id,
+                              }
+                            );
+                            console.log(response);
+                          };
+                          handleCancelSentRequest();
+                        }}
+                      >
+                        Hủy yêu cầu
+                      </Button>
+                    </HStack>
+                  </Button>
+                );
+              })}
           </ModalBody>
         </ModalContent>
       </Modal>
