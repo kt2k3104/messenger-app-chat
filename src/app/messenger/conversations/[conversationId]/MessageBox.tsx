@@ -4,6 +4,7 @@ import {
   AvatarBadge,
   AvatarGroup,
   HStack,
+  Highlight,
   Img,
   Text,
   Tooltip,
@@ -13,6 +14,7 @@ import useActiveList, { ActiveListStore } from "~/hooks/useActiveList";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
 import { formatDate } from "./BoxSearchMessage";
+import useLogic, { LogicState } from "~/hooks/useLogic";
 
 interface IMessageBoxProps {
   message: Message;
@@ -42,10 +44,16 @@ function MessageBox({
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-
   const membersOnline = useActiveList(
     (state: ActiveListStore) => state.members
   );
+  const searchMessageValue = useConversations(
+    (state: ConversationsState) => state.searchMessageValue
+  );
+  const isShowMessageWhenSearch = useLogic(
+    (state: LogicState) => state.isShowMessageWhenSearch
+  );
+
   return (
     <>
       {(message.type === MessageTypes.TEXT ||
@@ -80,16 +88,38 @@ function MessageBox({
                     placement="left"
                     borderRadius="5px"
                   >
-                    <Text
-                      ml="auto"
-                      h="35px"
-                      p="8px 12px"
-                      bgColor="primary.100"
-                      borderRadius="999px"
-                      color="#fff"
-                    >
-                      {message.content}
-                    </Text>
+                    {!isShowMessageWhenSearch ? (
+                      <Text
+                        ml="auto"
+                        h="35px"
+                        p="8px 12px"
+                        bgColor="primary.100"
+                        borderRadius="999px"
+                        color="#fff"
+                      >
+                        {message.content}
+                      </Text>
+                    ) : (
+                      <Text
+                        ml="auto"
+                        h="35px"
+                        p="8px 12px"
+                        bgColor="primary.100"
+                        borderRadius="999px"
+                        color="#fff"
+                      >
+                        <Highlight
+                          query={searchMessageValue}
+                          styles={{
+                            px: "1",
+                            py: "1",
+                            bg: "orange.100",
+                          }}
+                        >
+                          {message.content}
+                        </Highlight>
+                      </Text>
+                    )}
                   </Tooltip>
                 )}
               </VStack>
@@ -162,15 +192,36 @@ function MessageBox({
                       placement="right"
                       borderRadius="5px"
                     >
-                      <Text
-                        h="35px"
-                        p="8px 12px"
-                        bgColor="primary.100"
-                        borderRadius="999px"
-                        color="#fff"
-                      >
-                        {message.content}
-                      </Text>
+                      {!isShowMessageWhenSearch ? (
+                        <Text
+                          h="35px"
+                          p="8px 12px"
+                          bgColor="primary.100"
+                          borderRadius="999px"
+                          color="#fff"
+                        >
+                          {message.content}
+                        </Text>
+                      ) : (
+                        <Text
+                          h="35px"
+                          p="8px 12px"
+                          bgColor="primary.100"
+                          borderRadius="999px"
+                          color="#fff"
+                        >
+                          <Highlight
+                            query={searchMessageValue}
+                            styles={{
+                              px: "1",
+                              py: "1",
+                              bg: "orange.100",
+                            }}
+                          >
+                            {message.content}
+                          </Highlight>
+                        </Text>
+                      )}
                     </Tooltip>
                   )}
                   {message.images?.length > 0 && (

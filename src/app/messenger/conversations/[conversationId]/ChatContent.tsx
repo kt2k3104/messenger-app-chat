@@ -2,9 +2,9 @@
 import {
   Box,
   Button,
-  Center,
   HStack,
   Input,
+  Spinner,
   Text,
   Tooltip,
   VStack,
@@ -19,38 +19,40 @@ import CustomIcons from "~/app/components/Icon";
 import PreviewImage from "./PreviewImage";
 import { useDebounce } from "use-debounce";
 import useLogic, { LogicState } from "~/hooks/useLogic";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
 
 function ChatContent({ conversationId }: { conversationId: any }) {
   const [images, setImages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const [debounceMessage] = useDebounce(inputMessage, 500);
-  const buttonRef = useRef<HTMLDivElement>(null);
-  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
+  const [typing, setTyping] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [firstMessageId, setFirstMessageId] = useState<string>("");
 
-  const clearTimerId = useRef<any>(null);
-  const typingRef = useRef<any>(null);
-  const inputImageRef = useRef<any>(null);
-
+  const messages = useConversations(
+    (state: ConversationsState) => state.messages
+  );
+  const setMessages = useConversations(
+    (state: ConversationsState) => state.setMessages
+  );
+  const currUserId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   const isShowBoxSearchMessage = useLogic(
     (state: LogicState) => state.isShowBoxSearchMessage
   );
+  const currConversation = useConversations(
+    (state: ConversationsState) => state.currConversation
+  );
+  const setIsShowMessageWhenSearch = useLogic(
+    (state: LogicState) => state.setIsShowMessageWhenSearch
+  );
+  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
-  useEffect(() => {
-    if (debounceMessage !== "") {
-      requestApi(`messages/typing`, "POST", {
-        conversationId: conversationId,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounceMessage]);
-
-  useEffect(() => {
-    if (inputImageRef.current) {
-      inputImageRef.current.value = "";
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images]);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const clearTimerId = useRef<any>(null);
+  const typingRef = useRef<any>(null);
+  const inputImageRef = useRef<any>(null);
+  const chatContentRef = useRef<any>(null);
+  const messageBoxRef = useRef<any>(null);
 
   const handleSubmitSendMessage = async (
     e: React.FormEvent<HTMLDivElement>
@@ -79,10 +81,9 @@ function ChatContent({ conversationId }: { conversationId: any }) {
       console.log(error);
     }
   };
-  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
   useEffect(() => {
-    const callApi = async () => {
+    const callApiGetMessagesWithConversationId = async () => {
       const { data: messagesData } = await requestApi(
         `messages/${conversationId}?limit=20&direction=up`,
         "GET",
@@ -91,34 +92,79 @@ function ChatContent({ conversationId }: { conversationId: any }) {
       setMessages(messagesData.metadata.reverse());
       await requestApi(`conversations/seen/${conversationId}`, "POST", {});
     };
-    callApi();
-  }, [conversationId]);
+    callApiGetMessagesWithConversationId();
+  }, [conversationId, setMessages]);
+
+  useEffect(() => {
+    const chatContent: any = chatContentRef.current;
+    async function handleScroll() {
+      if (chatContent.scrollTop === 0 && messages[0]._id !== firstMessageId) {
+        setIsLoading(true);
+        const response = await requestApi(
+          `messages/${conversationId}?next=${messages[0]._id}&limit=20&direction=up`,
+          "GET",
+          null
+        );
+        if (response.data.metadata.length === 0) {
+          setIsLoading(false);
+          setFirstMessageId(messages[0]._id);
+          return;
+        }
+        setIsLoading(false);
+        setMessages([...response.data.metadata.reverse(), ...messages]);
+        messageBoxRef.current.scrollIntoView({});
+      }
+
+      if (
+        Math.ceil(chatContent.scrollTop) ===
+          chatContent.scrollHeight - chatContent.clientHeight &&
+        isShowBoxSearchMessage
+      ) {
+        const response = await requestApi(
+          `messages/${conversationId}?next=${
+            messages[messages.length - 1]._id
+          }&limit=20&direction=down`,
+          "GET",
+          null
+        );
+        if (response.data.metadata.length === 0) {
+          return;
+        }
+        console.log(response);
+        setMessages([...messages, ...response.data.metadata]);
+      }
+    }
+
+    chatContent.addEventListener("scroll", handleScroll);
+    return () => {
+      chatContent.removeEventListener("scroll", handleScroll);
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, messages, firstMessageId, isShowBoxSearchMessage]);
 
   useEffect(() => {
     if (!pusherClient || !conversationId) return;
     const channel = pusherClient.subscribe(conversationId);
 
     channel.bind("message:new", (data: Message) => {
-      setMessages((prev) => [...prev, data]);
+      setMessages([...messages, data]);
       requestApi(`conversations/seen/${conversationId}`, "POST", {});
     });
     channel.bind("message:update", (data: { updatedMessage: Message }) => {
-      setMessages((messages) => {
-        return messages.map((message: Message) => {
+      setMessages(
+        messages.map((message: Message) => {
           if (message._id === data.updatedMessage._id)
             return data.updatedMessage;
           else return message;
-        });
-      });
+        })
+      );
     });
     channel.bind("message:typing", (data: { userId: string }) => {
-      if (data.userId === userId) {
-        return;
-      }
-      typingRef.current.innerHTML = "Đang gõ...";
+      setTyping([data.userId]);
       clearTimeout(clearTimerId.current);
       clearTimerId.current = setTimeout(() => {
-        typingRef.current.innerHTML = "";
+        setTyping([]);
       }, 900);
     });
 
@@ -130,12 +176,51 @@ function ChatContent({ conversationId }: { conversationId: any }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, pusherClient]);
+
+  useEffect(() => {
+    if (debounceMessage !== "") {
+      requestApi(`messages/typing`, "POST", {
+        conversationId: conversationId,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounceMessage]);
+
+  useEffect(() => {
+    if (inputImageRef.current) {
+      inputImageRef.current.value = "";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images]);
+
+  useEffect(() => {
+    if (typing.length === 1 && typing[0] === currUserId) return;
+    if (typing.length === 0) {
+      typingRef.current.innerHTML = "";
+    }
+    if (typing.length === 1) {
+      if (currConversation?.isGroup) {
+        typingRef.current.innerHTML = `${
+          currConversation.members.filter(
+            (member) => member._id === typing[0]
+          )[0].firstName
+        } đang gõ...`;
+      } else typingRef.current.innerHTML = "Đang gõ...";
+    }
+  }, [typing, currUserId, currConversation]);
+
   useEffect(() => {
     if (buttonRef.current) {
       buttonRef.current.scrollIntoView({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, typingRef.current]);
+  }, [messages.length === 0, typingRef.current, typing]);
+
+  useEffect(() => {
+    if (!isShowBoxSearchMessage) {
+      setIsShowMessageWhenSearch(false);
+    }
+  }, [isShowBoxSearchMessage, setIsShowMessageWhenSearch]);
 
   let flagUserId = "";
   let isInBlock = false;
@@ -157,8 +242,14 @@ function ChatContent({ conversationId }: { conversationId: any }) {
         w="100%"
         p="10px"
         gap="0"
+        ref={chatContentRef}
       >
         <Box flex="1"></Box>
+        {isLoading && (
+          <HStack justifyContent="center">
+            <Spinner />
+          </HStack>
+        )}
         {messages.map((message, index, array) => {
           if (message.sender._id === flagUserId) {
             if (message.sender._id !== array[index + 1]?.sender._id) {
@@ -213,10 +304,14 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           };
 
           return (
-            <HStack key={message._id} w="100%" justifyContent="center">
+            <HStack
+              ref={index === 0 ? messageBoxRef : null}
+              key={message._id}
+              w="100%"
+              justifyContent="center"
+            >
               <MessageBox
                 message={message}
-                // isLastMessage={index === messages.length - 1 ? true : false}
                 isLastMessage={checkIsLastMessage(index, array)}
                 isInBlock={isInBlock}
                 isLastInBlock={isLastInBlock}

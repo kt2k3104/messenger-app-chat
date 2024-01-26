@@ -1,9 +1,14 @@
 import { create } from "zustand";
-import { Conversation } from "./useUserInfo";
+import { Conversation, Message } from "./useUserInfo";
 
 export interface ConversationsState {
   conversations: Conversation[];
   currConversation: Conversation | null;
+  messages: Message[];
+  searchMessageValue: string;
+  setSearchMessageValue: (value: string) => void;
+
+  setMessages: (messages: Message[]) => void;
   setCurrConversation: (conversation: Conversation | null) => void;
   updateCurrConversation: (conversation: Conversation) => void;
   setConversations: (conversations: Conversation[]) => void;
@@ -25,6 +30,10 @@ export enum ConversationTag {
 const useConversations = create<ConversationsState>((set) => ({
   conversations: [],
   currConversation: null,
+  messages: [],
+  setMessages: (messages: Message[]) => set({ messages: messages }),
+  searchMessageValue: "",
+  setSearchMessageValue: (value: string) => set({ searchMessageValue: value }),
   setCurrConversation: (conversation: Conversation | null) =>
     set({ currConversation: conversation }),
   setConversations: (conversations: Conversation[]) =>

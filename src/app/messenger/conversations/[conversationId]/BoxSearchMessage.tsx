@@ -43,25 +43,38 @@ function BoxSearchMessage() {
   const currConversationId = useConversations(
     (state: ConversationsState) => state.currConversation?._id
   );
+  const setMessages = useConversations(
+    (state: ConversationsState) => state.setMessages
+  );
+  const searchMessageValue = useConversations(
+    (state: ConversationsState) => state.searchMessageValue
+  );
+  const setSearchMessageValue = useConversations(
+    (state: ConversationsState) => state.setSearchMessageValue
+  );
+  const setIsShowMessageWhenSearch = useLogic(
+    (state: LogicState) => state.setIsShowMessageWhenSearch
+  );
+
   const borderColor = useColorModeValue("#e5e5e5", "#ffffff1a");
   const bgColorBoxSearchResult = useColorModeValue("#f3f3f4", "#262b36");
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [searchResult, setSearchResult] = useState<string[]>([]);
+
+  const [searchMessageResult, setSearchMessageResult] = useState<any>([]);
 
   const handleSearchMessage = async () => {
     const res = await requestApi(
-      `messages/search/content/${currConversationId}?keyword=${searchValue}`,
+      `messages/search/content/${currConversationId}?keyword=${searchMessageValue}`,
       "GET",
       ""
     );
-    setSearchResult(res.data.metadata.result);
+    setSearchMessageResult(res.data.metadata.result);
   };
 
   useEffect(() => {
-    if (searchValue === "") {
-      setSearchResult([]);
+    if (searchMessageValue === "") {
+      setSearchMessageResult([]);
     }
-  }, [searchValue]);
+  }, [searchMessageValue, setSearchMessageResult]);
 
   return (
     <HStack
@@ -104,9 +117,9 @@ function BoxSearchMessage() {
             fontWeight: 300,
             fontSize: "1.5rem",
           }}
-          value={searchValue}
+          value={searchMessageValue}
           onChange={(e) => {
-            setSearchValue(e.target.value);
+            setSearchMessageValue(e.target.value);
           }}
           onKeyDown={(e) => {
             if (e.key === "Escape") {
@@ -118,7 +131,7 @@ function BoxSearchMessage() {
             }
           }}
         />
-        {searchValue && (
+        {searchMessageValue && (
           <Button
             flexShrink="0"
             as="div"
@@ -131,14 +144,14 @@ function BoxSearchMessage() {
             color="primary.100"
             cursor="pointer"
             onClick={() => {
-              setSearchValue("");
-              setSearchResult([]);
+              setSearchMessageValue("");
+              setSearchMessageResult([]);
             }}
           >
             <IoMdClose />
           </Button>
         )}
-        {searchResult?.length > 0 && (
+        {searchMessageResult?.length > 0 && (
           <Box
             position="absolute"
             top="40px"
@@ -151,7 +164,7 @@ function BoxSearchMessage() {
             p="10px"
             bgColor={bgColorBoxSearchResult}
           >
-            {searchResult.map((item: any) => {
+            {searchMessageResult.map((item: any) => {
               return (
                 <Button
                   key={item._id}
@@ -160,6 +173,20 @@ function BoxSearchMessage() {
                   h="32px"
                   mb="5px"
                   justifyContent="space-between"
+                  onClick={() => {
+                    const getMessages = async () => {
+                      const res = await requestApi(
+                        `messages/image/${currConversationId}?messid=${item._id}&range=10`,
+                        "GET",
+                        ""
+                      );
+                      console.log(res);
+                      setMessages(res.data.metadata);
+                      setSearchMessageResult([]);
+                      setIsShowMessageWhenSearch(true);
+                    };
+                    getMessages();
+                  }}
                 >
                   <Text>{item.content}</Text>
                   <Text fontSize="1.2rem" fontWeight="300">
@@ -176,9 +203,9 @@ function BoxSearchMessage() {
         h="24px"
         borderRadius="50%"
         p="0"
-        color={searchResult.length > 0 ? "primary.100" : ""}
-        opacity={searchResult.length > 0 ? 1 : 0.5}
-        cursor={searchResult.length > 0 ? "pointer" : "not-allowed"}
+        color={searchMessageResult.length > 0 ? "primary.100" : ""}
+        opacity={searchMessageResult.length > 0 ? 1 : 0.5}
+        cursor={searchMessageResult.length > 0 ? "pointer" : "not-allowed"}
       >
         <FaChevronUp />
       </Button>
@@ -187,9 +214,9 @@ function BoxSearchMessage() {
         h="24px"
         borderRadius="50%"
         p="0"
-        color={searchResult.length > 0 ? "primary.100" : ""}
-        opacity={searchResult.length > 0 ? 1 : 0.5}
-        cursor={searchResult.length > 0 ? "pointer" : "not-allowed"}
+        color={searchMessageResult.length > 0 ? "primary.100" : ""}
+        opacity={searchMessageResult.length > 0 ? 1 : 0.5}
+        cursor={searchMessageResult.length > 0 ? "pointer" : "not-allowed"}
       >
         <FaChevronDown />
       </Button>

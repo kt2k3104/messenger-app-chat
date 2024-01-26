@@ -10,15 +10,26 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import AuthForm from "./components/AuthForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Variant } from "./types";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
 
 export default function Home() {
   const [variant, setVariant] = useState<Variant>(Variant.LOGIN);
+
   const { colorMode, toggleColorMode } = useColorMode();
 
-  // const bg = useColorModeValue("#fff", "#242526");
-  // const color = useColorModeValue("black", "#050505");
+  const currConversation = useConversations(
+    (state: ConversationsState) => state.currConversation
+  );
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken && currConversation) {
+      window.location.href =
+        "/messenger/conversations/" + currConversation?._id;
+    }
+  }, [currConversation]);
 
   return (
     <Box p={"24vh 0"} h="100vh" overflow="hidden">

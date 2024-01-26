@@ -161,7 +161,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           window.location.href = "/messenger/conversations";
         }
       }
-      setSpinner(false);
+      // setSpinner(false);
     } catch (error: any) {
       console.log(error);
       if (error.response.data.message === "Email is not registred.") {

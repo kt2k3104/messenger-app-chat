@@ -21,7 +21,7 @@ import NewConversation from "./NewConversation";
 
 function New() {
   const [keyword, setKeyword] = useState<string>("");
-  const [searchValue] = useDebounce(keyword, 500);
+  const [searchMessageValue] = useDebounce(keyword, 500);
   const [searchResults, setSearchResults] = useState<any>(null);
   const bg = useColorModeValue("#fff", "#1b202b");
   const bgbtn = useColorModeValue("#f5f5f5", "#ffffff1a");
@@ -60,10 +60,10 @@ function New() {
   });
 
   useEffect(() => {
-    if (searchValue.trim()) {
+    if (searchMessageValue.trim()) {
       const handleSearchUsers = async () => {
         const { data: result } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchValue}`
+          `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchMessageValue}`
         );
         setSearchResults(result.metadata);
       };
@@ -71,7 +71,7 @@ function New() {
     } else {
       setSearchResults(null);
     }
-  }, [searchValue]);
+  }, [searchMessageValue]);
 
   useEffect(() => {
     setIsShowBoxNewConversation(true);
