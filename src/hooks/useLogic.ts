@@ -1,9 +1,13 @@
 import { create } from "zustand";
-import { Message, UserInfo } from "./useUserInfo";
+import { UserInfo } from "./useUserInfo";
 
 export interface LogicState {
-  notSeenMessage: Message[];
-  setNotSeenMessage: (notSeenMessage: Message[]) => void;
+  isInitLogin: boolean;
+  setIsInitLogin: (isInitLogin: boolean) => void;
+  notSeenMessage: string[];
+  AddNotSeenMessage: (conversationId: string) => void;
+  RemoveNotSeenMessage: (conversationId: string) => void;
+  setNotSeenMessage: (notSeenMessage: string[]) => void;
   isShowSidebarRight: boolean;
   setIsShowSidebarRight: (isShowSidebarRight: boolean) => void;
   isShowBoxNewConversation: boolean;
@@ -19,6 +23,8 @@ export interface LogicState {
 }
 
 const useLogic = create<LogicState>((set) => ({
+  isInitLogin: false,
+  setIsInitLogin: (isInitLogin: boolean) => set({ isInitLogin }),
   isShowSidebarRight: false,
   setIsShowSidebarRight: (isShowSidebarRight: boolean) =>
     set({ isShowSidebarRight }),
@@ -48,7 +54,17 @@ const useLogic = create<LogicState>((set) => ({
       ),
     })),
   notSeenMessage: [],
-  setNotSeenMessage: (notSeenMessage: Message[]) => set({ notSeenMessage }),
+  setNotSeenMessage: (notSeenMessage: string[]) => set({ notSeenMessage }),
+  AddNotSeenMessage: (conversationId: string) =>
+    set((state) => ({
+      notSeenMessage: [...state.notSeenMessage, conversationId],
+    })),
+  RemoveNotSeenMessage: (conversationId: string) =>
+    set((state) => ({
+      notSeenMessage: state.notSeenMessage.filter(
+        (id) => id !== conversationId
+      ),
+    })),
 }));
 
 export default useLogic;

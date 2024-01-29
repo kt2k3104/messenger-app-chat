@@ -72,7 +72,7 @@ export default function HeaderConversation() {
           color="#377af6"
           bgColor="transparent"
         >
-          <CustomIcons.icon_video_call />
+          <CustomIcons.icon_video_call color="var(--primary-icon)" />
         </Button>
         {!isShowSidebarRight ? (
           <Button

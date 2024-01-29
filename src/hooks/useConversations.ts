@@ -1,13 +1,16 @@
+import { update } from "lodash";
 import { create } from "zustand";
 import { Conversation, Message } from "./useUserInfo";
 
 export interface ConversationsState {
   conversations: Conversation[];
   currConversation: Conversation | null;
-  messages: Message[];
   searchMessageValue: string;
   setSearchMessageValue: (value: string) => void;
-
+  messages: Message[];
+  updateMessagesDown: (message: Message[]) => void;
+  updateMessagesUp: (message: Message[]) => void;
+  updateMessage: (message: Message) => void;
   setMessages: (messages: Message[]) => void;
   setCurrConversation: (conversation: Conversation | null) => void;
   updateCurrConversation: (conversation: Conversation) => void;
@@ -31,6 +34,25 @@ const useConversations = create<ConversationsState>((set) => ({
   conversations: [],
   currConversation: null,
   messages: [],
+  updateMessagesDown: (message: Message[]) => {
+    set((state: ConversationsState) => ({
+      messages: [...state.messages, ...message],
+    }));
+  },
+  updateMessagesUp: (message: Message[]) => {
+    set((state: ConversationsState) => ({
+      messages: [...message, ...state.messages],
+    }));
+  },
+  updateMessage: (message: Message) => {
+    set((state: ConversationsState) => {
+      const index = state.messages.findIndex((m) => m._id === message._id);
+      if (index !== -1) {
+        state.messages[index] = message;
+      }
+      return { messages: state.messages };
+    });
+  },
   setMessages: (messages: Message[]) => set({ messages: messages }),
   searchMessageValue: "",
   setSearchMessageValue: (value: string) => set({ searchMessageValue: value }),

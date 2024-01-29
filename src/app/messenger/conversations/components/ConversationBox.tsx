@@ -67,6 +67,7 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
   const lastMessage = conversation.messages[0];
 
   const bg = useColorModeValue("#f5f5f5", "#ffffff1a");
+  const color = useColorModeValue("#000", "#fff");
 
   const { isOpen, onToggle, onClose } = useDisclosure();
 
@@ -316,7 +317,11 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
                   bgColor={bg}
                   justifyContent="center"
                 >
-                  <CustomIcons.icon_video_call width="16px" height="16px" />
+                  <CustomIcons.icon_video_call
+                    width="16px"
+                    height="16px"
+                    color={color}
+                  />
                 </HStack>
                 <Text fontSize="1.4rem" fontWeight="500">
                   Chat video

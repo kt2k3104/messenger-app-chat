@@ -20,6 +20,7 @@ import PreviewImage from "./PreviewImage";
 import { useDebounce } from "use-debounce";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import { update } from "lodash";
 
 function ChatContent({ conversationId }: { conversationId: any }) {
   const [images, setImages] = useState<any[]>([]);
@@ -28,12 +29,24 @@ function ChatContent({ conversationId }: { conversationId: any }) {
   const [typing, setTyping] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [firstMessageId, setFirstMessageId] = useState<string>("");
+  const [isShowOverlay, setIsShowOverlay] = useState(true);
+  const [isHasNewMessage, setIsHasNewMessage] = useState(false);
+  const [waitingGetMessages, setWaitingGetMessages] = useState(false);
 
   const messages = useConversations(
     (state: ConversationsState) => state.messages
   );
+  const updateMessage = useConversations(
+    (state: ConversationsState) => state.updateMessage
+  );
   const setMessages = useConversations(
     (state: ConversationsState) => state.setMessages
+  );
+  const updateMessagesUp = useConversations(
+    (state: ConversationsState) => state.updateMessagesUp
+  );
+  const updateMessagesDown = useConversations(
+    (state: ConversationsState) => state.updateMessagesDown
   );
   const currUserId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   const isShowBoxSearchMessage = useLogic(
@@ -44,6 +57,10 @@ function ChatContent({ conversationId }: { conversationId: any }) {
   );
   const setIsShowMessageWhenSearch = useLogic(
     (state: LogicState) => state.setIsShowMessageWhenSearch
+  );
+  const notSeenMessage = useLogic((state: LogicState) => state.notSeenMessage);
+  const RemoveNotSeenMessage = useLogic(
+    (state: LogicState) => state.RemoveNotSeenMessage
   );
   const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
@@ -84,21 +101,30 @@ function ChatContent({ conversationId }: { conversationId: any }) {
 
   useEffect(() => {
     const callApiGetMessagesWithConversationId = async () => {
+      setWaitingGetMessages(true);
+      setMessages([]);
       const { data: messagesData } = await requestApi(
         `messages/${conversationId}?limit=20&direction=up`,
         "GET",
         null
       );
       setMessages(messagesData.metadata.reverse());
+      setWaitingGetMessages(false);
       await requestApi(`conversations/seen/${conversationId}`, "POST", {});
+      RemoveNotSeenMessage(conversationId);
     };
     callApiGetMessagesWithConversationId();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, setMessages]);
 
   useEffect(() => {
     const chatContent: any = chatContentRef.current;
     async function handleScroll() {
-      if (chatContent.scrollTop === 0 && messages[0]._id !== firstMessageId) {
+      if (
+        messages.length !== 0 &&
+        chatContent.scrollTop === 0 &&
+        messages[0]?._id !== firstMessageId
+      ) {
         setIsLoading(true);
         const response = await requestApi(
           `messages/${conversationId}?next=${messages[0]._id}&limit=20&direction=up`,
@@ -111,7 +137,8 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           return;
         }
         setIsLoading(false);
-        setMessages([...response.data.metadata.reverse(), ...messages]);
+        // setMessages([...response.data.metadata.reverse(), ...messages]);
+        updateMessagesUp(response.data.metadata.reverse());
         messageBoxRef.current.scrollIntoView({});
       }
 
@@ -131,7 +158,8 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           return;
         }
         console.log(response);
-        setMessages([...messages, ...response.data.metadata]);
+        // setMessages([...messages, ...response.data.metadata]);
+        updateMessagesDown(response.data.metadata);
       }
     }
 
@@ -148,17 +176,13 @@ function ChatContent({ conversationId }: { conversationId: any }) {
     const channel = pusherClient.subscribe(conversationId);
 
     channel.bind("message:new", (data: Message) => {
-      setMessages([...messages, data]);
+      updateMessagesDown([data]);
       requestApi(`conversations/seen/${conversationId}`, "POST", {});
+      setIsHasNewMessage(true);
+      // RemoveNotSeenMessage(conversationId);
     });
     channel.bind("message:update", (data: { updatedMessage: Message }) => {
-      setMessages(
-        messages.map((message: Message) => {
-          if (message._id === data.updatedMessage._id)
-            return data.updatedMessage;
-          else return message;
-        })
-      );
+      updateMessage(data.updatedMessage);
     });
     channel.bind("message:typing", (data: { userId: string }) => {
       setTyping([data.userId]);
@@ -211,10 +235,22 @@ function ChatContent({ conversationId }: { conversationId: any }) {
 
   useEffect(() => {
     if (buttonRef.current) {
-      buttonRef.current.scrollIntoView({});
+      // setIsShowOverlay(true);
+      buttonRef.current?.scrollIntoView({});
+      // setTimeout(() => {
+      //   buttonRef.current?.scrollIntoView({});
+      setIsShowOverlay(false);
+      setIsHasNewMessage(false);
+      // }, 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length === 0, typingRef.current, typing]);
+  }, [
+    // messages.length === 0,
+    typingRef.current,
+    typing,
+    isHasNewMessage,
+    waitingGetMessages,
+  ]);
 
   useEffect(() => {
     if (!isShowBoxSearchMessage) {
@@ -227,7 +263,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
   let isLastInBlock = false;
 
   return (
-    <VStack flex="1" w="100%">
+    <VStack flex="1" w="100%" position="relative">
       <VStack
         overflow="auto"
         h={
@@ -243,6 +279,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
         p="10px"
         gap="0"
         ref={chatContentRef}
+        opacity={isShowOverlay ? "0" : "1"}
       >
         <Box flex="1"></Box>
         {isLoading && (
@@ -322,6 +359,22 @@ function ChatContent({ conversationId }: { conversationId: any }) {
         <Text ref={typingRef}></Text>
         <Box ref={buttonRef}></Box>
       </VStack>
+      {isShowOverlay && (
+        <HStack
+          position="absolute"
+          // top="0"
+          right="0"
+          bottom="60px"
+          w="100%"
+          h="calc(100% - 60px)"
+          justifyContent="center"
+          alignItems="center"
+          // bgColor={bg}
+          bgColor="transparent"
+        >
+          <Spinner />
+        </HStack>
+      )}
       <HStack
         as="form"
         w="100%"

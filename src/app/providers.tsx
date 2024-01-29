@@ -20,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {`
           :root {
             --font-rubik: ${roboto.style.fontFamily};
+            --primary-icon: #84b1d1;
           }
 
           html {

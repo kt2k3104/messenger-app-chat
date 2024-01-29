@@ -22,7 +22,6 @@ import usePusher, { PusherState } from "~/hooks/usePusher";
 import requestApi from "~/utils/api";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import { usePathname } from "next/navigation";
-import { fr } from "date-fns/locale";
 
 export default function RootLayout({
   children,
@@ -30,13 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [NumOfNotSeenMessage, setNumOfNotSeenMessage] = useState(0);
 
   const user = useUserInfo((state: UserInfoState) => state.userInfo);
   const { colorMode, toggleColorMode } = useColorMode();
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const notSeenMessage = useLogic((state: LogicState) => state.notSeenMessage);
   const setNotSeenMessage = useLogic(
     (state: LogicState) => state.setNotSeenMessage
   );
@@ -80,8 +79,8 @@ export default function RootLayout({
         "GET",
         {}
       );
-      setNumOfNotSeenMessage(res.data.metadata.length);
       setNotSeenMessage(res.data.metadata);
+      console.log(res.data.metadata);
     };
     callApi();
   }, [setNotSeenMessage]);
@@ -120,7 +119,7 @@ export default function RootLayout({
                 Đoạn chat
               </Text>
             )}
-            {NumOfNotSeenMessage > 0 && (
+            {notSeenMessage.length > 0 && (
               <AvatarBadge
                 top="-3"
                 right="-1"
@@ -129,7 +128,7 @@ export default function RootLayout({
                 bg="tomato"
                 boxSize="1.25em"
               >
-                {NumOfNotSeenMessage}
+                {notSeenMessage.length}
               </AvatarBadge>
             )}
           </Avatar>

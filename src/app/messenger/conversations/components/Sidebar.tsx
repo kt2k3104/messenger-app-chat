@@ -54,6 +54,13 @@ function Sidebar() {
   const setWaitingForAddedToGroup = useLogic(
     (state: LogicState) => state.setWaitingForAddedToGroup
   );
+  const AddNotSeenMessage = useLogic(
+    (state: LogicState) => state.AddNotSeenMessage
+  );
+  const RemoveNotSeenMessage = useLogic(
+    (state: LogicState) => state.RemoveNotSeenMessage
+  );
+  const notSeenMessage = useLogic((state: LogicState) => state.notSeenMessage);
 
   if (conversations)
     conversations = _.orderBy(conversations, ["lastMessageAt"], ["desc"]);
@@ -74,6 +81,15 @@ function Sidebar() {
       console.log(data);
       updateConversation(data);
       updateCurrConversation(data);
+      if (
+        !notSeenMessage.find((id) => id === data.conversationId) &&
+        data.lastMessage.sender._id !== userId
+      ) {
+        AddNotSeenMessage(data.conversationId);
+      }
+      if (data.tag === "seen") {
+        RemoveNotSeenMessage(data.conversationId);
+      }
     });
     return () => {
       pusherClient?.unsubscribe(userId);
@@ -81,7 +97,7 @@ function Sidebar() {
       pusherClient?.unbind("conversation:update");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, pusherClient]);
+  }, [userId, pusherClient, notSeenMessage]);
 
   return (
     <VStack p="0 6px">

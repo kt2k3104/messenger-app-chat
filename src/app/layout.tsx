@@ -8,6 +8,7 @@ import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import { useRouter } from "next/navigation";
 import InitPusher from "./components/InitPusher";
 import ActiveStatus from "./messenger/conversations/components/ActiveStatus";
+import useLogic, { LogicState } from "~/hooks/useLogic";
 
 export default function RootLayout({
   children,
@@ -31,12 +32,14 @@ export default function RootLayout({
   const setSentRequests = useUserInfo(
     (state: UserInfoState) => state.setSentRequests
   );
+  const setIsInitLogin = useLogic((state: LogicState) => state.setIsInitLogin);
 
   const router = useRouter();
 
   useEffect(() => {
     const initLogin = async () => {
       try {
+        setIsInitLogin(true);
         const access_token = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId");
         if (access_token && userId) {
@@ -61,11 +64,10 @@ export default function RootLayout({
           setConversation(conversationsData.metadata);
           conversationsData.metadata[0] &&
             setCurrConversation(conversationsData.metadata[0]);
-
           // router.push(
           //   "/messenger/conversations/" + conversationsData.metadata[0]._id
           // );
-        }
+        } else setIsInitLogin(false);
       } catch (error) {
         console.log(error);
         localStorage.removeItem("accessToken");
@@ -76,7 +78,7 @@ export default function RootLayout({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    document.title = "Messenger";
+    document.title = "App chat cực mạnh";
   }, []);
   return (
     <html lang="en">

@@ -17,7 +17,7 @@ import requestApi from "~/utils/api";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useRouter } from "next/navigation";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
-import { stat } from "fs";
+import useLogic, { LogicState } from "~/hooks/useLogic";
 
 type Inputs = {
   firstName: string;
@@ -38,7 +38,6 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [spinner, setSpinner] = useState(false);
 
-  const router = useRouter();
   const toast = useToast();
 
   const setUserInfo = useUserInfo((state: UserInfoState) => state.setUserInfo);
@@ -58,6 +57,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
   const setSentRequests = useUserInfo(
     (state: UserInfoState) => state.setSentRequests
   );
+  const isInitLogin = useLogic((state: LogicState) => state.isInitLogin);
 
   const {
     register,
@@ -192,7 +192,7 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
           Đăng ký
         </Text>
       )}
-      {spinner ? (
+      {spinner || isInitLogin ? (
         <Box w="100%" textAlign="center">
           <Spinner
             thickness="4px"
