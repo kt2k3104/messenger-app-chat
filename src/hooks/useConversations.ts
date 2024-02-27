@@ -4,19 +4,19 @@ import { Conversation, Message } from "./useUserInfo";
 
 export interface ConversationsState {
   conversations: Conversation[];
-  currConversation: Conversation | null;
-  searchMessageValue: string;
-  setSearchMessageValue: (value: string) => void;
-  messages: Message[];
-  updateMessagesDown: (message: Message[]) => void;
-  updateMessagesUp: (message: Message[]) => void;
-  updateMessage: (message: Message) => void;
-  setMessages: (messages: Message[]) => void;
-  setCurrConversation: (conversation: Conversation | null) => void;
-  updateCurrConversation: (conversation: Conversation) => void;
   setConversations: (conversations: Conversation[]) => void;
   updateConversations: (conversations: Conversation[]) => void;
   pushConversation: (conversation: Conversation) => void;
+  currConversation: Conversation | null;
+  setCurrConversation: (conversation: Conversation | null) => void;
+  updateCurrConversation: (conversation: Conversation) => void;
+  searchMessageValue: string;
+  setSearchMessageValue: (value: string) => void;
+  messages: Message[];
+  setMessages: (messages: Message[]) => void;
+  updateMessage: (message: Message) => void;
+  updateMessagesDown: (message: Message[]) => void;
+  updateMessagesUp: (message: Message[]) => void;
 }
 export enum ConversationTag {
   SEEN = "seen",

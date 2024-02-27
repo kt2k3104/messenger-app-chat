@@ -21,6 +21,7 @@ import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
 import usePusher, { PusherState } from "~/hooks/usePusher";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import ConversationBox from "./ConversationBox";
+import requestApi from "~/utils/api";
 
 function Sidebar() {
   let conversations = useConversations(
@@ -60,7 +61,9 @@ function Sidebar() {
   const RemoveNotSeenMessage = useLogic(
     (state: LogicState) => state.RemoveNotSeenMessage
   );
-  const notSeenMessage = useLogic((state: LogicState) => state.notSeenMessage);
+  const notSeenMessages = useLogic(
+    (state: LogicState) => state.notSeenMessages
+  );
 
   if (conversations)
     conversations = _.orderBy(conversations, ["lastMessageAt"], ["desc"]);
@@ -74,7 +77,7 @@ function Sidebar() {
     if (!pusherClient || !userId) return;
     pusherClient.subscribe(userId);
 
-    pusherClient.bind("conversation:new", (data: Conversation) => {
+    pusherClient.bind("conversation:new", async (data: Conversation) => {
       pushConversation(data);
     });
     pusherClient.bind("conversation:update", (data: any) => {
@@ -82,7 +85,7 @@ function Sidebar() {
       updateConversation(data);
       updateCurrConversation(data);
       if (
-        !notSeenMessage.find((id) => id === data.conversationId) &&
+        !notSeenMessages.find((id) => id === data.conversationId) &&
         data.lastMessage.sender._id !== userId
       ) {
         AddNotSeenMessage(data.conversationId);
@@ -97,7 +100,7 @@ function Sidebar() {
       pusherClient?.unbind("conversation:update");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, pusherClient, notSeenMessage]);
+  }, [userId, pusherClient, notSeenMessages]);
 
   return (
     <VStack p="0 6px">

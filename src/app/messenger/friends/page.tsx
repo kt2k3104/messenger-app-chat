@@ -4,7 +4,6 @@ import { Box, Grid, HStack, Text } from "@chakra-ui/react";
 import Sidebar from "./Sidebar";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import BoxStrangeUser from "./BoxStrangeUser";
-import { stat } from "fs";
 
 enum SentStatus {
   CANCELLED = "cancelled",
@@ -52,7 +51,7 @@ const SuggestionFriends = () => {
                   sentRequests?.some((item) => item.receiver._id === user._id)
                     ? SentStatus.PENDING
                     : friendRequests?.some(
-                        (item) => item.sender._id === user._id
+                        (item) => item?.sender._id === user._id
                       )
                     ? SentStatus.MYPENDING
                     : SentStatus.STRANGE

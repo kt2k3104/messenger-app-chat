@@ -15,8 +15,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import usePusher, { PusherState } from "~/hooks/usePusher";
+import { useState } from "react";
 import useUserInfo, { SentRequest, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
 
@@ -62,24 +61,6 @@ function ModalFriendRequest({
     onOpen: onOpenModalInvitationSent,
     onClose: onCloseModalInvitationSent,
   } = useDisclosure();
-
-  const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
-  const pusherClient = usePusher((state: PusherState) => state.pusherClient);
-
-  useEffect(() => {
-    if (!pusherClient || !userId) return;
-    const channel = pusherClient.subscribe(userId);
-
-    channel.bind("friend:request", (data: any) => {
-      console.log(data);
-      // setFriendRequests((prev: any) => [...prev, data]);
-    });
-
-    return () => {
-      pusherClient.unsubscribe(userId);
-      channel.unbind_all();
-    };
-  }, [pusherClient, userId]);
 
   return (
     <>
@@ -130,7 +111,7 @@ function ModalFriendRequest({
                 return (
                   <Button
                     as="div"
-                    key={request.sender._id}
+                    key={request?.sender._id}
                     w="100%"
                     h="72px"
                     bgColor="transparent"
@@ -140,7 +121,7 @@ function ModalFriendRequest({
                   >
                     <Img
                       src={
-                        request.sender.avatar
+                        request?.sender.avatar
                           ? request.sender.avatar
                           : "https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
                       }
@@ -150,7 +131,7 @@ function ModalFriendRequest({
                       borderRadius="50%"
                       mr="12px"
                     />
-                    <Text>{request.sender.displayName}</Text>
+                    <Text>{request?.sender.displayName}</Text>
                     <HStack ml="auto" fontSize="1.2rem">
                       {loading ? (
                         <Spinner
@@ -179,21 +160,21 @@ function ModalFriendRequest({
                                   "users/accept-friend",
                                   "POST",
                                   {
-                                    userId: request.sender._id,
+                                    userId: request?.sender._id,
                                   }
                                 );
                                 setFriendRequests(
                                   friendRequests.filter(
                                     (val) =>
-                                      val.sender._id !== request.sender._id
+                                      val?.sender._id !== request?.sender._id
                                   )
                                 );
                                 setStrangeUsers(
                                   strangeUsers.filter((val) => {
-                                    return val._id !== request.sender._id;
+                                    return val._id !== request?.sender._id;
                                   })
                                 );
-                                setFriends([...friends, request.sender]);
+                                setFriends([...friends, request?.sender]);
                                 onCloseModalFriendRequest();
                                 setLoading(false);
                               };
@@ -212,14 +193,15 @@ function ModalFriendRequest({
                                   "users/reject-friend",
                                   "POST",
                                   {
-                                    userId: request.sender._id,
+                                    userId: request?.sender._id,
                                   }
                                 );
                               };
                               handleRejectFriendRequest();
                               setFriendRequests(
                                 friendRequests.filter(
-                                  (val) => val.sender._id !== request.sender._id
+                                  (val) =>
+                                    val?.sender._id !== request?.sender._id
                                 )
                               );
                             }}
@@ -314,14 +296,9 @@ function ModalFriendRequest({
                                   val.receiver._id !== request.receiver._id
                               )
                             );
-                            const response = await requestApi(
-                              "users/cancel-friend",
-                              "POST",
-                              {
-                                userId: request.receiver._id,
-                              }
-                            );
-                            console.log(response);
+                            await requestApi("users/cancel-friend", "POST", {
+                              userId: request.receiver._id,
+                            });
                           };
                           handleCancelSentRequest();
                         }}

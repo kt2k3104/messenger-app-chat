@@ -1,34 +1,63 @@
 "use client";
 
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogCloseButton,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Avatar,
   AvatarBadge,
   Box,
   Button,
+  HStack,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   Text,
   Tooltip,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
+import { TfiMoreAlt } from "react-icons/tfi";
+
 import CustomIcons from "~/app/components/Icon";
 import useActiveList, { ActiveListStore } from "~/hooks/useActiveList";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import ModalFriendRequest from "./ModalFriendRequests";
+import { useRef } from "react";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import requestApi from "~/utils/api";
+import { useRouter } from "next/navigation";
 
 function Sidebar() {
+  const friends = useUserInfo((state: UserInfoState) => state.friends);
+  const friendRequests = useUserInfo(
+    (state: UserInfoState) => state.friendRequests
+  );
+  const conversations = useConversations(
+    (state: ConversationsState) => state.conversations
+  );
+  const removeFriend = useUserInfo(
+    (state: UserInfoState) => state.removeFriend
+  );
+  const userActive = useActiveList((state: ActiveListStore) => state.members);
+
+  const cancelRef = useRef<any>();
+
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
+  const router = useRouter();
 
   const {
     isOpen: isOpenModalFriendRequest,
     onOpen: onOpenModalFriendRequest,
     onClose: onCloseModalFriendRequest,
   } = useDisclosure();
-
-  const friends = useUserInfo((state: UserInfoState) => state.friends);
-  const friendRequests = useUserInfo(
-    (state: UserInfoState) => state.friendRequests
-  );
-  const userActive = useActiveList((state: ActiveListStore) => state.members);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box
@@ -93,7 +122,7 @@ function Sidebar() {
       </Text>
       {friends.map((user) => {
         return (
-          <Button
+          <HStack
             key={user._id}
             w="95%"
             h="52px"
@@ -102,6 +131,10 @@ function Sidebar() {
             justifyContent="flex-start"
             bgColor="transparent"
             borderRadius="8px"
+            _hover={{
+              bgColor: "bgLightActive.100",
+            }}
+            role="group"
           >
             <Avatar
               mt="auto"
@@ -120,7 +153,114 @@ function Sidebar() {
             <Text ml="8px" fontSize="1.4rem" fontWeight="500">
               {user.displayName}
             </Text>
-          </Button>
+
+            <Popover>
+              <PopoverTrigger>
+                <Button
+                  w="32px"
+                  h="32px"
+                  borderRadius="50%"
+                  boxShadow="0 0 0 1px rgba(0,0,0,0.1)"
+                  ml="auto"
+                  alignItems="center"
+                  display="none"
+                  _groupHover={{
+                    display: "flex",
+                  }}
+                  fontSize="24px"
+                  bgColor="transparent"
+                  border="none"
+                >
+                  <TfiMoreAlt />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent borderRadius="10px">
+                <PopoverArrow />
+                <PopoverBody p="4px">
+                  <Button
+                    as="div"
+                    w="100%"
+                    h="44px"
+                    p="8px"
+                    bg="transparent"
+                    justifyContent="start"
+                    _hover={{
+                      bgColor: "bgLightActive.100",
+                    }}
+                    onClick={() => {
+                      conversations.forEach((conversation) => {
+                        if (
+                          !conversation.isGroup &&
+                          conversation.members.filter((member) => {
+                            return member._id === user._id;
+                          }).length > 0
+                        ) {
+                          router.push(
+                            `/messenger/conversations/${conversation._id}`
+                          );
+                        }
+                      });
+                    }}
+                  >
+                    Nhắn tin
+                  </Button>
+                  <Button
+                    as="div"
+                    w="100%"
+                    h="44px"
+                    p="8px"
+                    bg="transparent"
+                    justifyContent="start"
+                    _hover={{
+                      bgColor: "bgLightActive.100",
+                    }}
+                    onClick={onOpen}
+                  >
+                    Hủy kết bạn
+                  </Button>
+                  <AlertDialog
+                    motionPreset="slideInBottom"
+                    leastDestructiveRef={cancelRef}
+                    onClose={onClose}
+                    isOpen={isOpen}
+                    isCentered
+                  >
+                    <AlertDialogOverlay bgColor="rgba(0,0,0, .1)" />
+
+                    <AlertDialogContent borderRadius="10px">
+                      <AlertDialogHeader>Hủy kết bạn</AlertDialogHeader>
+                      <AlertDialogCloseButton />
+                      <AlertDialogBody>
+                        Bạn và {user.displayName} sẽ không còn là bạn bè của
+                        nhau nữa?
+                      </AlertDialogBody>
+                      <AlertDialogFooter>
+                        <Button ref={cancelRef} onClick={onClose}>
+                          Hủy
+                        </Button>
+                        <Button
+                          colorScheme="blue"
+                          ml={3}
+                          onClick={() => {
+                            const handleRemoveFriend = async () => {
+                              await requestApi("users/remove-friend", "POST", {
+                                userId: user._id,
+                              });
+                              removeFriend(user._id);
+                              onClose();
+                            };
+                            handleRemoveFriend();
+                          }}
+                        >
+                          Xác nhận
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+          </HStack>
         );
       })}
     </Box>

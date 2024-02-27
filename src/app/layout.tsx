@@ -72,6 +72,7 @@ export default function RootLayout({
         console.log(error);
         localStorage.removeItem("accessToken");
         router.push("/");
+        setIsInitLogin(false);
       }
     };
     initLogin();
@@ -82,7 +83,7 @@ export default function RootLayout({
   }, []);
   return (
     <html lang="en">
-      <body>
+      <body style={{ overflow: "hidden" }}>
         <InitPusher />
         <ActiveStatus />
         <Providers>{children}</Providers>

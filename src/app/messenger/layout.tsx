@@ -23,6 +23,13 @@ import requestApi from "~/utils/api";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import { usePathname } from "next/navigation";
 
+enum FriendTag {
+  ADD_FRIEND = "add-friend",
+  ACCEPT_FRIEND_REQUEST = "accept-friend-request",
+  REMOVE_FRIEND = "remove-friend",
+  CANCEL_FRIEND_REQUEST = "cancel-friend-request",
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -35,16 +42,26 @@ export default function RootLayout({
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-  const notSeenMessage = useLogic((state: LogicState) => state.notSeenMessage);
+  const notSeenMessages = useLogic(
+    (state: LogicState) => state.notSeenMessages
+  );
   const setNotSeenMessage = useLogic(
     (state: LogicState) => state.setNotSeenMessage
   );
   const friendRequests = useUserInfo(
     (state: UserInfoState) => state.friendRequests
   );
-  const setFriendRequests = useUserInfo(
-    (state: UserInfoState) => state.setFriendRequests
+  const addFriendRequest = useUserInfo(
+    (state: UserInfoState) => state.addFriendRequest
   );
+  const removeFriendRequest = useUserInfo(
+    (state: UserInfoState) => state.removeFriendRequest
+  );
+  const addFriend = useUserInfo((state: UserInfoState) => state.addFriend);
+  const removeFriend = useUserInfo(
+    (state: UserInfoState) => state.removeFriend
+  );
+
   const pusherClient = usePusher((state: PusherState) => state.pusherClient);
 
   const userId = user?._id;
@@ -63,14 +80,34 @@ export default function RootLayout({
     const channel = pusherClient.subscribe(userId);
 
     channel.bind("friend:request", (data: any) => {
-      setFriendRequests([...friendRequests, data.userInfo]);
+      console.log(data);
+      if (data.tag === FriendTag.ADD_FRIEND) {
+        addFriendRequest(data.userInfo);
+      }
+      if (data.tag === FriendTag.CANCEL_FRIEND_REQUEST) {
+        removeFriendRequest(data.friendId);
+      }
+      if (data.tag === FriendTag.ACCEPT_FRIEND_REQUEST) {
+        addFriend(data.newFriend);
+      }
+      if (data.tag === FriendTag.REMOVE_FRIEND) {
+        removeFriend(data.friendId);
+      }
     });
 
     return () => {
       pusherClient.unsubscribe(userId);
       channel.unbind_all();
     };
-  }, [pusherClient, userId, friendRequests, setFriendRequests]);
+  }, [
+    pusherClient,
+    userId,
+    friendRequests,
+    addFriendRequest,
+    removeFriendRequest,
+    addFriend,
+    removeFriend,
+  ]);
 
   useEffect(() => {
     const callApi = async () => {
@@ -80,7 +117,6 @@ export default function RootLayout({
         {}
       );
       setNotSeenMessage(res.data.metadata);
-      console.log(res.data.metadata);
     };
     callApi();
   }, [setNotSeenMessage]);
@@ -119,7 +155,7 @@ export default function RootLayout({
                 Đoạn chat
               </Text>
             )}
-            {notSeenMessage.length > 0 && (
+            {notSeenMessages.length > 0 && (
               <AvatarBadge
                 top="-3"
                 right="-1"
@@ -128,7 +164,7 @@ export default function RootLayout({
                 bg="tomato"
                 boxSize="1.25em"
               >
-                {notSeenMessage.length}
+                {notSeenMessages.length}
               </AvatarBadge>
             )}
           </Avatar>

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Box,
   Button,
@@ -8,21 +9,25 @@ import {
   Text,
   Tooltip,
   VStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { BsEmojiSmile } from "react-icons/bs";
+import { RiAttachmentLine } from "react-icons/ri";
+import { RiMicLine } from "react-icons/ri";
+import { RiSendPlaneLine } from "react-icons/ri";
 
-import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
+import CustomIcons from "~/app/components/Icon";
+import PreviewImage from "~/app/messenger/conversations/[conversationId]/PreviewImage";
+import useConversations, { ConversationsState } from "~/hooks/useConversations";
+import useLogic, { LogicState } from "~/hooks/useLogic";
 import usePusher, { PusherState } from "~/hooks/usePusher";
+import useUserInfo, { Message, UserInfoState } from "~/hooks/useUserInfo";
 import requestApi from "~/utils/api";
 import MessageBox, { MessageTypes } from "./MessageBox";
-import CustomIcons from "~/app/components/Icon";
-import PreviewImage from "./PreviewImage";
-import { useDebounce } from "use-debounce";
-import useLogic, { LogicState } from "~/hooks/useLogic";
-import useConversations, { ConversationsState } from "~/hooks/useConversations";
-import { update } from "lodash";
 
-function ChatContent({ conversationId }: { conversationId: any }) {
+function ChatContent({ conversationId }: { conversationId: string }) {
   const [images, setImages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [debounceMessage] = useDebounce(inputMessage, 500);
@@ -264,24 +269,44 @@ function ChatContent({ conversationId }: { conversationId: any }) {
   let isInBlock = false;
   let isLastInBlock = false;
 
+  const bgScrollbar = useColorModeValue("#e5e5e5", "#212427");
+
+  const bgInput = useColorModeValue("#e5e5e5", "#212427");
+
   return (
-    <VStack flex="1" w="100%" position="relative">
+    <>
       <VStack
         overflow="auto"
-        h={
-          images.length > 0 && isShowBoxSearchMessage
-            ? "calc(100vh - 252px)"
-            : images.length > 0 && !isShowBoxSearchMessage
-            ? "calc(100vh - 196px)"
-            : images.length === 0 && isShowBoxSearchMessage
-            ? "calc(100vh - 172px)"
-            : "calc(100vh - 116px)"
-        }
+        // h={
+        //   images.length > 0 && isShowBoxSearchMessage
+        //     ? "calc(100% - 252px)"
+        //     : images.length > 0 && !isShowBoxSearchMessage
+        //     ? "calc(100% - 196px)"
+        //     : images.length === 0 && isShowBoxSearchMessage
+        //     ? "calc(100% - 172px)"
+        //     : "calc(100% - 116px)"
+        // }
+        // h="calc(500px)"
+        // flex="1 1 auto"
+        h="100%"
         w="100%"
         p="10px"
+        pr="-16px"
         gap="0"
         ref={chatContentRef}
         opacity={isShowOverlay ? "0" : "1"}
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: "5px",
+          },
+          "&::-webkit-scrollbar-track": {
+            width: "5px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: bgScrollbar,
+            borderRadius: "24px",
+          },
+        }}
       >
         <Box flex="1"></Box>
         {isLoading && (
@@ -380,15 +405,17 @@ function ChatContent({ conversationId }: { conversationId: any }) {
       <HStack
         as="form"
         w="100%"
-        h={images.length === 0 ? "60px" : "140px"}
+        h={images.length === 0 ? "90px" : "170px"}
         onSubmit={(e) => {
           handleSubmitSendMessage(e);
         }}
-        p="0 10px 0 5px"
-        gap="0"
+        p="0 10px 0 15px"
+        gap="10px"
+        bg={bgInput}
+        borderRadius="15px"
       >
         <Tooltip
-          label="Mở hành động khác"
+          label="Emoji"
           fontSize="12px"
           p="5px"
           hasArrow
@@ -399,71 +426,11 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             h="36px"
             borderRadius="50%"
             p="0"
-            mt="auto"
-            mb="12px"
             bgColor="transparent"
+            fontSize="2rem"
+            opacity=".5"
           >
-            <CustomIcons.icon_more />
-          </Button>
-        </Tooltip>
-        <Tooltip
-          label="Đính kèm file"
-          fontSize="12px"
-          p="5px"
-          hasArrow
-          borderRadius="5px"
-        >
-          <Button
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            p="0"
-            mt="auto"
-            mb="12px"
-            bgColor="transparent"
-          >
-            <label htmlFor="image" style={{ cursor: "pointer" }}>
-              <CustomIcons.icon_send_image />
-            </label>
-          </Button>
-        </Tooltip>
-        <Tooltip
-          label="Chọn nhãn dán"
-          fontSize="12px"
-          p="5px"
-          hasArrow
-          borderRadius="5px"
-        >
-          <Button
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            p="0"
-            mt="auto"
-            mb="12px"
-            bgColor="transparent"
-          >
-            <CustomIcons.icon_select_sticker />
-          </Button>
-        </Tooltip>
-        <Tooltip
-          label="Chọn file gif"
-          fontSize="12px"
-          p="5px"
-          hasArrow
-          borderRadius="5px"
-        >
-          <Button
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            p="0"
-            mt="auto"
-            mb="12px"
-            mr="8px"
-            bgColor="transparent"
-          >
-            <CustomIcons.icon_select_gif_file />
+            <BsEmojiSmile />
           </Button>
         </Tooltip>
 
@@ -487,7 +454,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           flex="1"
           h={images.length === 0 ? "36px" : "116px"}
           borderRadius={images.length === 0 ? "999px" : "20px"}
-          bgColor="rgba(134, 142, 153, 0.1)"
+          bgColor="transparent"
         >
           <HStack
             display={images.length === 0 ? "none" : "flex"}
@@ -496,6 +463,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
             p="12px"
             gap="10px"
             overflow="overlay"
+            bgColor="transparent"
           >
             <Button w="48px" h="48px" borderRadius="10px" bgColor="#e4e6ea">
               <label htmlFor="image">
@@ -513,12 +481,17 @@ function ChatContent({ conversationId }: { conversationId: any }) {
                 );
               })}
           </HStack>
-          <HStack alignItems="center" justifyContent="space-between" h="36px">
+          <HStack
+            bgColor="transparent"
+            alignItems="center"
+            justifyContent="space-between"
+            h="36px"
+          >
             <Input
               fontSize="1.4rem"
               borderRadius="999px"
               value={inputMessage}
-              placeholder="Aa"
+              placeholder="Write a message..."
               bgColor="transparent"
               outline="none"
               border="none"
@@ -529,52 +502,47 @@ function ChatContent({ conversationId }: { conversationId: any }) {
                 setInputMessage(e.target.value);
               }}
             />
-            <Button
-              flexShrink="0"
-              type="submit"
-              w="36px"
-              h="36px"
-              borderRadius="50%"
-              p="0"
-              mt="auto"
-              mb="12px"
-              bgColor="transparent"
-            >
-              <CustomIcons.icon_select_emoji />
-            </Button>
           </HStack>
         </Box>
-        {inputMessage !== "" || images.length !== 0 ? (
-          <Button
-            type="submit"
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            p="0"
-            mt="auto"
-            mb="12px"
-            ml="8px"
-            bgColor="transparent"
-          >
-            <CustomIcons.icon_send_message />
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            w="36px"
-            h="36px"
-            borderRadius="50%"
-            p="0"
-            mt="auto"
-            mb="12px"
-            ml="8px"
-            bgColor="transparent"
-          >
-            <CustomIcons.icon_like />
-          </Button>
-        )}
+        <Button
+          type="submit"
+          w="36px"
+          h="36px"
+          borderRadius="50%"
+          p="0"
+          bgColor="transparent"
+          fontSize="2rem"
+          opacity=".5"
+        >
+          <RiAttachmentLine />
+        </Button>
+        <Button
+          type="submit"
+          w="36px"
+          h="36px"
+          borderRadius="50%"
+          p="0"
+          bgColor="transparent"
+          fontSize="2rem"
+          opacity=".5"
+        >
+          <RiMicLine />
+        </Button>
+
+        <Button
+          type="submit"
+          w="48px"
+          h="48px"
+          borderRadius="15px"
+          p="0"
+          bgColor="#db4663"
+          fontSize="2rem"
+          _hover={{ opacity: ".9" }}
+        >
+          <RiSendPlaneLine />
+        </Button>
       </HStack>
-    </VStack>
+    </>
   );
 }
 

@@ -7,9 +7,7 @@ import {
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
-  PopoverHeader,
   PopoverTrigger,
   Text,
   VStack,
@@ -25,29 +23,14 @@ import { IoIosWarning } from "react-icons/io";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 import useUserInfo, { Conversation, UserInfoState } from "~/hooks/useUserInfo";
-import ThumbConversation from "./ThumbConversation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CustomIcons from "~/app/components/Icon";
-
-export const convertTime = (created_at: string) => {
-  const createdAtDate: Date = new Date(created_at);
-  const currentTime: Date = new Date();
-  const timeDifference = Number(currentTime) - Number(createdAtDate) + 4000;
-  const secondsDifference = Math.floor(timeDifference / 1000);
-  const minutesDifference = Math.floor(secondsDifference / 60);
-  const hoursDifference = Math.floor(minutesDifference / 60);
-  const daysDifference = Math.floor(hoursDifference / 24);
-
-  if (secondsDifference < 10) return "Vừa xong";
-  if (secondsDifference >= 10 && secondsDifference < 60)
-    return `${secondsDifference} giây`;
-  if (minutesDifference < 60) return `${minutesDifference} phút`;
-  if (hoursDifference < 24) return `${hoursDifference} giờ`;
-  if (daysDifference >= 1) return `${daysDifference} ngày`;
-};
+import ThumbConversation from "~/app/messenger/conversations/components/ThumbConversation";
+import { formatDate } from "~/app/messenger/conversations/[conversationId]/BoxSearchMessage";
 
 function ConversationBox({ conversation }: { conversation: Conversation }) {
-  console.log(conversation.messages.length);
+  const [numOfNotSeenMessages, setNumOfNotSeenMessages] = useState(0);
+
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
@@ -63,6 +46,10 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
+  const conversations = useConversations(
+    (state: ConversationsState) => state.conversations
+  );
+
   const userId = useUserInfo((state: UserInfoState) => state.userInfo)?._id;
   // const lastMessage = conversation.messages[0];
   const lastMessage = conversation.messages[0];
@@ -83,10 +70,26 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage]);
 
+  useEffect(() => {
+    let count = 0;
+    for (let i = 0; i < conversation.messages.length; i++) {
+      if (
+        conversation.messages[i].seenUsers.some((user) => user._id === userId)
+      ) {
+        break;
+      } else {
+        if (conversation.messages[i].sender._id !== userId) {
+          count++;
+        }
+      }
+    }
+    setNumOfNotSeenMessages(count);
+  }, [conversation.messages, userId]);
+
   return (
     <Link
       style={{ width: "100%" }}
-      href={`/messenger/conversations/${conversation._id}`}
+      href={`/appchatcucmanh/messages/${conversation._id}`}
       passHref
       key={conversation._id}
       onClick={() => {
@@ -101,15 +104,16 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
         _hover={{
           bgColor: "bgLightActive.100",
         }}
-        bgColor={
-          conversation._id === currConversation?._id
-            ? "bgLightActive.100"
-            : "transparent"
-        }
-        p="10px"
-        mr="6px"
-        borderRadius="10px"
+        bgColor="transparent"
+        p="20px "
         role="group"
+        borderLeft={
+          conversation._id === currConversation?._id
+            ? "2px solid #db4663"
+            : "none"
+        }
+        borderBottom="2px solid #272b2e"
+        gap="15px"
       >
         <ThumbConversation conversation={conversation} size="md" />
         <VStack alignItems="center" gap="0">
@@ -125,30 +129,55 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
               : conversation.members[0].displayName}
           </Text>
           {conversation.messages.length > 0 && (
-            <HStack
+            <Text
               display={{ base: "none", lg: "flex" }}
-              color="textSecond.100"
+              color="#848d92"
               fontWeight={checkSeenMessage ? "400" : "bold"}
-              fontSize="1.2rem"
               maxH="180px"
+              fontSize="1.3rem"
+              maxW="160px"
               mr="auto"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
             >
-              <Text
-                fontSize="1.2rem"
-                maxW="160px"
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {conversation.messages[0].sender._id === userId
-                  ? "Bạn"
-                  : conversation.messages[0].sender.firstName}
-                : {conversation.messages[0].content}
-              </Text>
-              <Text fontSize="1.2rem">
-                ·{convertTime(conversation.messages[0].createdAt)}
-              </Text>
-            </HStack>
+              {conversation.messages[0].sender._id === userId
+                ? "Bạn"
+                : conversation.messages[0].sender.firstName}
+              : {conversation.messages[0].content}
+            </Text>
+          )}
+        </VStack>
+        <VStack
+          _groupHover={{
+            display: "none",
+          }}
+          display={isOpen ? "none" : "flex"}
+          h="45px"
+          ml="auto"
+          justifyContent="start"
+          alignItems="start"
+        >
+          {conversation.messages.length > 0 && (
+            <Text fontSize="1.2rem" color="#848d92">
+              {formatDate(conversation.messages[0].createdAt)}
+            </Text>
+          )}
+          {numOfNotSeenMessages > 0 && (
+            <Button
+              as="div"
+              borderRadius="50%"
+              w="25px"
+              h="25px"
+              p="0"
+              flexShrink="0"
+              ml="auto"
+              mt="auto"
+              bgColor="#53aa91"
+              _hover={{ opacity: 0.9 }}
+            >
+              {numOfNotSeenMessages}
+            </Button>
           )}
         </VStack>
         <Popover isOpen={isOpen} onClose={onClose}>
