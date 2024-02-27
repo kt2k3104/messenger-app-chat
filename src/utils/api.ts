@@ -1,9 +1,11 @@
 "use client";
 
 import axios from "axios";
+import { NEXT_PUBLIC_API_URL } from "~/app/env";
 
 // export const BASEURL = "https://thinhnguyen.live/api/v1/";
-export const BASEURL = process.env.NEXT_PUBLIC_API_URL;
+// export const BASEURL = process.env.NEXT_PUBLIC_API_URL;
+export const BASEURL = NEXT_PUBLIC_API_URL;
 
 // export const BASEURL = NEXT_PUBLIC_API_URL;
 

@@ -1,10 +1,13 @@
 // "use client";
 import PusherClient from "pusher-js";
+import { NEXT_PUBLIC_PUSHER_CLUSTER, NEXT_PUBLIC_PUSHER_KEY } from "~/app/env";
 
 export const pusherClient = new PusherClient(
-  process.env.NEXT_PUBLIC_PUSHER_KEY as string,
+  // process.env.NEXT_PUBLIC_PUSHER_KEY as string,
+  NEXT_PUBLIC_PUSHER_KEY as string,
   {
-    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
+    cluster: NEXT_PUBLIC_PUSHER_CLUSTER as string,
+    // cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
     // channelAuthorization: {
     //   headers: {
     //     Authorization: `Bearer ${accessToken}`,

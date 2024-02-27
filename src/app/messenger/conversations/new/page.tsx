@@ -18,6 +18,7 @@ import useLogic, { LogicState } from "~/hooks/useLogic";
 import useUserInfo, { UserInfo, UserInfoState } from "~/hooks/useUserInfo";
 import ChatContent from "../[conversationId]/ChatContent";
 import NewConversation from "./NewConversation";
+import { NEXT_PUBLIC_API_URL } from "~/app/env";
 
 function New() {
   const [keyword, setKeyword] = useState<string>("");
@@ -63,7 +64,8 @@ function New() {
     if (searchMessageValue.trim()) {
       const handleSearchUsers = async () => {
         const { data: result } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchMessageValue}`
+          // `${process.env.NEXT_PUBLIC_API_URL}users/search?keyword=${searchMessageValue}`
+          `${NEXT_PUBLIC_API_URL}users/search?keyword=${searchMessageValue}`
         );
         setSearchResults(result.metadata);
       };

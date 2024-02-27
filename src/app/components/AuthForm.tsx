@@ -18,6 +18,7 @@ import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useRouter } from "next/navigation";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
+import { NEXT_PUBLIC_API_URL } from "../env";
 
 type Inputs = {
   firstName: string;
@@ -81,7 +82,8 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
     }
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}auth/register`,
+        // `${process.env.NEXT_PUBLIC_API_URL}auth/register`,
+        `${NEXT_PUBLIC_API_URL}auth/register`,
         {
           firstName: data.firstName,
           lastName: data.lastName,
