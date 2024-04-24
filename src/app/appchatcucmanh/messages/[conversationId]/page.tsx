@@ -17,6 +17,9 @@ const ConversationBody = ({ params }: { params: IParams }) => {
   const setIsShowBoxSearchMessage = useLogic(
     (state: LogicState) => state.setIsShowBoxSearchMessage
   );
+  const isShowSidebarRight = useLogic(
+    (state: LogicState) => state.isShowSidebarRight
+  );
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
@@ -33,7 +36,7 @@ const ConversationBody = ({ params }: { params: IParams }) => {
         (conversation) => conversation._id === params.conversationId
       )
     ) {
-      window.location.href = "/appchatcucmanh/";
+      window.location.href = `/appchatcucmanh`;
     }
   }, [params, conversations]);
 
@@ -58,19 +61,39 @@ const ConversationBody = ({ params }: { params: IParams }) => {
           h="90px"
           bgColor={bg}
           borderTopLeftRadius="16px"
-          borderTopRightRadius="16px"
+          borderTopRightRadius={isShowSidebarRight ? "0" : "16px"}
           alignItems="center"
           justifyContent="space-between"
           p="16px 26px"
+          borderRight={isShowSidebarRight ? "1px solid" : "none"}
+          borderColor={"#272b2e"}
         >
           <HeaderConversation />
         </HStack>
-        {isShowBoxSearchMessage && <BoxSearchMessage />}
+        {isShowBoxSearchMessage && (
+          <HStack
+            w="100%"
+            h="56px"
+            boxShadow="-3px 4px 3px -4px rgba(0, 0, 0, 0.2)"
+            borderTop="1px solid "
+            borderRight={isShowSidebarRight ? "1px solid" : "none"}
+            borderColor="#272b2e"
+            p="8px 12px"
+            gap="12px"
+            alignItems="center"
+            justifyContent={"space-between"}
+            bgColor={"#212427"}
+          >
+            <BoxSearchMessage />
+          </HStack>
+        )}
         <VStack
-          h="calc(100% - 90px)"
+          h={
+            isShowBoxSearchMessage ? "calc(100% - 146px)" : "calc(100% - 90px)"
+          }
           w="100%"
           bg="#272b2e"
-          borderBottomRightRadius="16px"
+          borderBottomRightRadius={isShowSidebarRight ? "0" : "16px"}
           position="relative"
           p="0 20px 20px 28px"
         >

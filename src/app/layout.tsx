@@ -7,7 +7,7 @@ import requestApi from "~/utils/api";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import { useRouter } from "next/navigation";
 import InitPusher from "./components/InitPusher";
-import ActiveStatus from "./messenger/conversations/components/ActiveStatus";
+import ActiveStatus from "./components/ActiveStatus";
 import useLogic, { LogicState } from "~/hooks/useLogic";
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
     (state: UserInfoState) => state.setStrangeUsers
   );
   const setUserInfo = useUserInfo((state: UserInfoState) => state.setUserInfo);
-  const setConversation = useConversations(
+  const setConversations = useConversations(
     (state: ConversationsState) => state.setConversations
   );
   const setCurrConversation = useConversations(
@@ -61,7 +61,7 @@ export default function RootLayout({
             "GET",
             null
           );
-          setConversation(conversationsData.metadata);
+          setConversations(conversationsData.metadata);
           conversationsData.metadata[0] &&
             setCurrConversation(conversationsData.metadata[0]);
           // router.push(

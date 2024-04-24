@@ -13,7 +13,7 @@ function Messages({ children }: { children: React.ReactNode }) {
         h="calc(100% - 90px)"
         bgColor="transparent"
         gap="0"
-        p="10px 36px 40px"
+        p={{ base: "10px 10px 40px", lg: "10px 36px 40px" }}
       >
         <SideBar />
         {children}

@@ -30,7 +30,7 @@ export default function Home() {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken && currConversation) {
       window.location.href =
-        "/messenger/conversations/" + currConversation?._id;
+        "/appchatcucmanh/messages/" + currConversation?._id;
     } else setIsInitLogin(false);
   }, [currConversation, setIsInitLogin]);
 

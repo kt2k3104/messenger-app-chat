@@ -22,7 +22,7 @@ interface IMessageBoxProps {
   message: Message;
   isLastMessage: boolean;
   isInBlock: boolean;
-  isLastInBlock?: boolean;
+  isFirstInBlock?: boolean;
 }
 export enum MessageTypes {
   TEXT = "TEXT",
@@ -40,7 +40,7 @@ function MessageBox({
   message,
   isLastMessage,
   isInBlock,
-  isLastInBlock,
+  isFirstInBlock,
 }: IMessageBoxProps) {
   const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
   const currConversation = useConversations(
@@ -96,10 +96,10 @@ function MessageBox({
                     {!isShowMessageWhenSearch ? (
                       <Text
                         ml="auto"
-                        p="16px 14px"
+                        p="16px"
                         bgColor={bgMyBoxMessage}
-                        borderRadius="12px"
-                        borderTopRightRadius="5px"
+                        borderRadius="16px"
+                        borderTopRightRadius="8px"
                         color="#fff"
                       >
                         {message.content}
@@ -109,8 +109,8 @@ function MessageBox({
                         ml="auto"
                         p="16px 14px"
                         bgColor={bgMyBoxMessage}
-                        borderRadius="12px"
-                        borderTopRightRadius="5px"
+                        borderRadius="16px"
+                        borderTopRightRadius="8px"
                         color="#fff"
                       >
                         <Highlight
@@ -167,7 +167,12 @@ function MessageBox({
                     borderRadius="8px"
                     p="5px"
                   >
-                    <Avatar mt="auto" src={message.sender.avatar} size="md">
+                    <Avatar
+                      mt="auto"
+                      mb={"10px"}
+                      src={message.sender.avatar}
+                      size="md"
+                    >
                       {membersOnline.findIndex((member) => {
                         return member === message.sender._id;
                       }) >= 0 && (
@@ -177,16 +182,11 @@ function MessageBox({
                   </Tooltip>
                 )}
                 <VStack
-                  ml={!isLastInBlock ? "40px" : "0"}
+                  ml={!isFirstInBlock ? "40px" : "0"}
                   alignItems="flex-start"
                 >
                   {currConversation?.isGroup && !isInBlock && (
-                    <Text
-                      mr="auto"
-                      ml="10px"
-                      fontSize="1.2rem"
-                      color="textSecond.100"
-                    >
+                    <Text mr="auto" fontSize="1.2rem" color="textSecond.100">
                       {message.sender.firstName}
                     </Text>
                   )}
@@ -200,20 +200,20 @@ function MessageBox({
                     >
                       {!isShowMessageWhenSearch ? (
                         <Text
-                          p="16px 14px"
+                          p="16px"
                           bgColor="#53aa91"
-                          borderRadius="12px"
-                          borderTopLeftRadius="5px"
+                          borderRadius="16px"
+                          borderTopLeftRadius={"8px"}
                           color="#fff"
                         >
                           {message.content}
                         </Text>
                       ) : (
                         <Text
-                          p="16px 14px"
+                          p="16px"
                           bgColor="#53aa91"
-                          borderRadius="15px"
-                          borderTopLeftRadius="5px"
+                          borderRadius="16px"
+                          borderTopLeftRadius="8px"
                           color="#fff"
                         >
                           <Highlight

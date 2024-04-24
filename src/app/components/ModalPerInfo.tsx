@@ -1,12 +1,6 @@
 "use client";
 
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Box,
   Button,
   HStack,
@@ -37,8 +31,8 @@ import CustomIcons from "./Icon";
 import requestApi from "~/utils/api";
 import { useForm } from "react-hook-form";
 import { MdLogout } from "react-icons/md";
-import { useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import AlertLogout from "./AlertLogout";
 
 function ModalPerInfo({
   isOpenModalPerInfo,
@@ -53,8 +47,7 @@ function ModalPerInfo({
   const bg = useColorModeValue("#e5e5e5", "#ffffff1a");
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<any>();
-
+  const pathName = usePathname();
   const {
     register,
     handleSubmit,
@@ -106,7 +99,13 @@ function ModalPerInfo({
   return (
     <Modal isOpen={isOpenModalPerInfo} onClose={onCloseModalPerInfo}>
       <ModalOverlay />
-      <ModalContent maxW="548px" maxH="656px" mt="10vh" borderRadius="10px">
+      <ModalContent
+        maxW="548px"
+        mt="calc((100vh - 639px)/2)"
+        borderRadius="10px"
+        overflow="auto"
+        bgColor={pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""}
+      >
         <ModalHeader
           textAlign="center"
           fontSize="1.6rem"
@@ -131,7 +130,7 @@ function ModalPerInfo({
           <Button
             as="div"
             w="100%"
-            h="100%"
+            h="68px"
             p="8px"
             justifyContent="flex-start"
             alignItems="center"
@@ -152,7 +151,7 @@ function ModalPerInfo({
                   src={
                     userInfo?.avatar
                       ? userInfo.avatar
-                      : "https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
+                      : "https://scontent.fhan14-5.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=YknWlsUwj4wAX9Xrcoh&_nc_ht=scontent.fhan14-5.fna&oh=00_AfDXmRAlUkJnACxAqR1G5BxGq7Zeaun_IC3chAlXLs0LWA&oe=6617F9F8"
                   }
                   alt="avt"
                   w="60px"
@@ -215,8 +214,20 @@ function ModalPerInfo({
                     Đổi mật khẩu
                   </Text>
                 </PopoverTrigger>
-                <PopoverContent p="5px" borderRadius="10px">
-                  <PopoverArrow />
+                <PopoverContent
+                  p="5px"
+                  borderRadius="10px"
+                  bgColor={
+                    pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""
+                  }
+                >
+                  <PopoverArrow
+                    bgColor={
+                      pathName.split("/")[1] === "appchatcucmanh"
+                        ? "#212427"
+                        : ""
+                    }
+                  />
                   <PopoverCloseButton />
                   <PopoverHeader fontSize="1.4rem" fontWeight="500">
                     Đổi mật khẩu
@@ -414,39 +425,7 @@ function ModalPerInfo({
               Đăng xuất
             </Text>
           </Button>
-          <AlertDialog
-            isOpen={isOpen}
-            leastDestructiveRef={cancelRef}
-            onClose={onClose}
-          >
-            <AlertDialogOverlay>
-              <AlertDialogContent mt="30vh">
-                <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                  Đăng xuất
-                </AlertDialogHeader>
-
-                <AlertDialogBody>
-                  Bạn có chắc chắn muốn đăng xuất?
-                </AlertDialogBody>
-
-                <AlertDialogFooter>
-                  <Button ref={cancelRef} onClick={onClose}>
-                    Hủy
-                  </Button>
-                  <Button
-                    ml={3}
-                    colorScheme="blue"
-                    onClick={() => {
-                      localStorage.removeItem("accessToken");
-                      window.location.href = "/";
-                    }}
-                  >
-                    Đăng xuất
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialogOverlay>
-          </AlertDialog>
+          <AlertLogout isOpen={isOpen} onClose={onClose} />
         </ModalBody>
       </ModalContent>
     </Modal>

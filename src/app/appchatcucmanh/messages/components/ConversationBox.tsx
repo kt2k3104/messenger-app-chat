@@ -27,6 +27,7 @@ import { useEffect, useMemo, useState } from "react";
 import CustomIcons from "~/app/components/Icon";
 import ThumbConversation from "~/app/messenger/conversations/components/ThumbConversation";
 import { formatDate } from "~/app/messenger/conversations/[conversationId]/BoxSearchMessage";
+import { usePathname } from "next/navigation";
 
 function ConversationBox({ conversation }: { conversation: Conversation }) {
   const [numOfNotSeenMessages, setNumOfNotSeenMessages] = useState(0);
@@ -46,10 +47,9 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
   const currConversation = useConversations(
     (state: ConversationsState) => state.currConversation
   );
-  const conversations = useConversations(
-    (state: ConversationsState) => state.conversations
+  const notSeenMessages = useLogic(
+    (state: LogicState) => state.notSeenMessages
   );
-
   const userId = useUserInfo((state: UserInfoState) => state.userInfo)?._id;
   // const lastMessage = conversation.messages[0];
   const lastMessage = conversation.messages[0];
@@ -86,12 +86,18 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
     setNumOfNotSeenMessages(count);
   }, [conversation.messages, userId]);
 
+  useEffect(() => {
+    if (!notSeenMessages.some((id) => id === conversation._id)) {
+      setNumOfNotSeenMessages(0);
+    }
+  }, [currConversation, notSeenMessages, conversation]);
+
+  const pathname = usePathname();
   return (
     <Link
       style={{ width: "100%" }}
       href={`/appchatcucmanh/messages/${conversation._id}`}
       passHref
-      key={conversation._id}
       onClick={() => {
         setCurrConversation(conversation);
         if (isShowBoxNewConversation && waitingForAddedToGroup.length === 0)
@@ -105,7 +111,11 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
           bgColor: "bgLightActive.100",
         }}
         bgColor="transparent"
-        p="20px "
+        p={
+          conversation._id === currConversation?._id
+            ? "20px 20px 20px 18px"
+            : "20px"
+        }
         role="group"
         borderLeft={
           conversation._id === currConversation?._id
@@ -121,6 +131,10 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
             display={{ base: "none", lg: "inline" }}
             fontWeight="500"
             mr="auto"
+            maxW={{ lg: "50px", xl: "120px", "2xl": "160px" }}
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
           >
             {conversation.isGroup
               ? conversation.name
@@ -135,7 +149,7 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
               fontWeight={checkSeenMessage ? "400" : "bold"}
               maxH="180px"
               fontSize="1.3rem"
-              maxW="160px"
+              maxW={{ lg: "50px", xl: "120px", "2xl": "160px" }}
               mr="auto"
               whiteSpace="nowrap"
               overflow="hidden"
@@ -180,7 +194,7 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
             </Button>
           )}
         </VStack>
-        <Popover isOpen={isOpen} onClose={onClose}>
+        <Popover isOpen={isOpen} onClose={onClose} placement="right">
           <PopoverTrigger>
             <Button
               w="32px"
@@ -199,12 +213,25 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
                 e.stopPropagation();
                 onToggle();
               }}
+              flexShrink={0}
             >
               <TfiMoreAlt />
             </Button>
           </PopoverTrigger>
-          <PopoverContent maxW="344px" w="344px" p="0" borderRadius="10px">
-            <PopoverArrow />
+          <PopoverContent
+            maxW="344px"
+            w="344px"
+            p="0"
+            borderRadius="10px"
+            bgColor={
+              pathname.split("/")[1] === "appchatcucmanh" ? "#212427" : ""
+            }
+          >
+            <PopoverArrow
+              bgColor={
+                pathname.split("/")[1] === "appchatcucmanh" ? "#212427" : ""
+              }
+            />
             <PopoverBody p="4px">
               <Button
                 as="div"
@@ -469,7 +496,7 @@ function ConversationBox({ conversation }: { conversation: Conversation }) {
                     justifyContent="center"
                     fontSize="16px"
                   >
-                    <CustomIcons.icon_leave_conversation />
+                    <CustomIcons.icon_leave_conversation color="#fff" />
                   </HStack>
                   <Text fontSize="1.4rem" fontWeight="500">
                     Rời nhóm

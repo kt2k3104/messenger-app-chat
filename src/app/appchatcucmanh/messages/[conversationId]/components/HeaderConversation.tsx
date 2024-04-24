@@ -9,6 +9,8 @@ import { IoEllipsisVertical } from "react-icons/io5";
 
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
+import useLogic, { LogicState } from "~/hooks/useLogic";
+
 import ThumbConversation from "~/app/messenger/conversations/components/ThumbConversation";
 
 function HeaderConversation() {
@@ -16,6 +18,15 @@ function HeaderConversation() {
     (state: ConversationsState) => state.currConversation
   );
   const userId = useUserInfo((state: UserInfoState) => state.userInfo?._id);
+  const isShowSidebarRight = useLogic(
+    (state: LogicState) => state.isShowSidebarRight
+  );
+  const setIsShowSidebarRight = useLogic(
+    (state: LogicState) => state.setIsShowSidebarRight
+  );
+  const setIsShowBoxSearchMessage = useLogic(
+    (state: LogicState) => state.setIsShowBoxSearchMessage
+  );
 
   const bg = useColorModeValue("#e5e5e5", "#212427");
   const bgButton = useColorModeValue("#fff", "#1c1e21");
@@ -46,6 +57,9 @@ function HeaderConversation() {
           fontSize="2.2rem"
           p="0"
           bgColor="transparent"
+          onClick={() => {
+            setIsShowBoxSearchMessage(true);
+          }}
         >
           <FiSearch />
         </Button>
@@ -79,6 +93,7 @@ function HeaderConversation() {
           fontSize="2.2rem"
           p="0"
           bgColor="transparent"
+          onClick={() => setIsShowSidebarRight(!isShowSidebarRight)}
         >
           <IoEllipsisVertical />
         </Button>

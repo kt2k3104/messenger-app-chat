@@ -93,8 +93,14 @@ function SideBar() {
   }, [userId, pusherClient, notSeenMessages]);
 
   return (
-    <Tabs w="360px" h="100%" position="relative" variant="unstyled">
-      <TabList h="30px" mt="15px">
+    <Tabs
+      w={{ base: "90px", lg: "240px", xl: "300px", "2xl": "360px" }}
+      h="100%"
+      position="relative"
+      variant="unstyled"
+      flexShrink={0}
+    >
+      <TabList h="30px" mt="15px" opacity={{ base: "0", lg: "1" }}>
         <Tab fontSize="1rem">CHATS</Tab>
         <Tab fontSize="1rem">GROUP CHAT</Tab>
         <Tab fontSize="1rem">CONTACTS</Tab>
@@ -105,6 +111,7 @@ function SideBar() {
         bg="#db4663"
         pl="10px"
         borderRadius="1px"
+        opacity={{ base: "0", lg: "1" }}
       />
       <TabPanels
         bgColor={bg}
@@ -112,11 +119,16 @@ function SideBar() {
         borderBottomLeftRadius="16px"
         h="calc(100% - 60px)"
         mt="15px"
+        overflow={"auto"}
       >
         <TabPanel p="0" h="100%">
-          <HStack p="15px 20px" justifyContent="space-between">
+          <HStack
+            p="15px 20px"
+            justifyContent="space-between"
+            display={{ base: "none", lg: "flex" }}
+          >
             <HStack gap="10px">
-              <Text>All Messages</Text>
+              <Text display={{ base: "none", xl: "inline" }}>All Messages</Text>
               <Button borderRadius="999px">{conversations.length}</Button>
               <Box
                 fontSize="1.2rem"
@@ -164,6 +176,7 @@ function SideBar() {
             borderRadius="10px"
             p="5px 15px 5px 5px"
             bgColor={bgInput}
+            display={{ base: "none", lg: "flex" }}
           >
             <Input
               border="none"
@@ -179,7 +192,7 @@ function SideBar() {
             <FiSearch />
           </HStack>
           <Box
-            h="calc(100% - 108px)"
+            h={{ base: "100%", lg: "calc(100% - 108px)" }}
             overflow="auto"
             sx={{
               "&::-webkit-scrollbar": {

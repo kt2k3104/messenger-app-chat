@@ -157,10 +157,13 @@ const AuthForm = ({ variant, setVariant }: AuthFormProps) => {
         setConversation(conversationsData.metadata);
         if (conversationsData.metadata[0]) {
           setCurrConversation(conversationsData.metadata[0]);
+          console.log(
+            "/appchatcucmanh/messages/" + conversationsData.metadata[0]._id
+          );
           window.location.href =
-            "/messenger/conversations/" + conversationsData.metadata[0]._id;
+            "/appchatcucmanh/messages/" + conversationsData.metadata[0]._id;
         } else {
-          window.location.href = "/messenger/conversations";
+          window.location.href = "/appchatcucmanh";
         }
       }
       // setSpinner(false);

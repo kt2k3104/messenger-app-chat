@@ -63,9 +63,6 @@ function ChatContent({ conversationId }: { conversationId: string }) {
   const setIsShowMessageWhenSearch = useLogic(
     (state: LogicState) => state.setIsShowMessageWhenSearch
   );
-  const notSeenMessages = useLogic(
-    (state: LogicState) => state.notSeenMessages
-  );
   const RemoveNotSeenMessage = useLogic(
     (state: LogicState) => state.RemoveNotSeenMessage
   );
@@ -87,10 +84,11 @@ function ChatContent({ conversationId }: { conversationId: string }) {
       setInputMessage("");
       setImages([]);
       if (images.length === 0) {
-        await requestApi("messages", "POST", {
+        const res = await requestApi("messages", "POST", {
           conversationId: conversationId,
           content: inputMessage,
         });
+        console.log(res);
       } else {
         const formData = new FormData();
         images.forEach((image) => {
@@ -242,22 +240,14 @@ function ChatContent({ conversationId }: { conversationId: string }) {
 
   useEffect(() => {
     if (buttonRef.current) {
-      // setIsShowOverlay(true);
       buttonRef.current?.scrollIntoView({});
-      // setTimeout(() => {
-      //   buttonRef.current?.scrollIntoView({});
-      setIsShowOverlay(false);
-      setIsHasNewMessage(false);
-      // }, 1000);
+      setTimeout(() => {
+        setIsShowOverlay(false);
+        setIsHasNewMessage(false);
+      }, 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // messages.length === 0,
-    typingRef.current,
-    typing,
-    isHasNewMessage,
-    waitingGetMessages,
-  ]);
+  }, [typingRef.current, typing, isHasNewMessage, waitingGetMessages]);
 
   useEffect(() => {
     if (!isShowBoxSearchMessage) {
@@ -267,7 +257,7 @@ function ChatContent({ conversationId }: { conversationId: string }) {
 
   let flagUserId = "";
   let isInBlock = false;
-  let isLastInBlock = false;
+  let isFirstInBlock = false;
 
   const bgScrollbar = useColorModeValue("#e5e5e5", "#212427");
 
@@ -277,21 +267,9 @@ function ChatContent({ conversationId }: { conversationId: string }) {
     <>
       <VStack
         overflow="auto"
-        // h={
-        //   images.length > 0 && isShowBoxSearchMessage
-        //     ? "calc(100% - 252px)"
-        //     : images.length > 0 && !isShowBoxSearchMessage
-        //     ? "calc(100% - 196px)"
-        //     : images.length === 0 && isShowBoxSearchMessage
-        //     ? "calc(100% - 172px)"
-        //     : "calc(100% - 116px)"
-        // }
-        // h="calc(500px)"
-        // flex="1 1 auto"
         h="100%"
         w="100%"
         p="10px"
-        pr="-16px"
         gap="0"
         ref={chatContentRef}
         opacity={isShowOverlay ? "0" : "1"}
@@ -316,43 +294,20 @@ function ChatContent({ conversationId }: { conversationId: string }) {
         )}
         {messages.map((message, index, array) => {
           if (message.sender._id === flagUserId) {
-            if (message.sender._id !== array[index + 1]?.sender._id) {
-              isInBlock = true;
-              isLastInBlock = true;
-            } else {
-              isInBlock = true;
-              isLastInBlock = false;
-              if (
-                array[index + 1]?.type !== MessageTypes.TEXT &&
-                array[index + 1]?.type !== MessageTypes.IMAGE
-              ) {
-                isInBlock = true;
-                isLastInBlock = true;
-              }
-            }
+            isFirstInBlock = false;
+            isInBlock = true;
+
             if (
               array[index - 1]?.type !== MessageTypes.TEXT &&
               array[index - 1]?.type !== MessageTypes.IMAGE
             ) {
               isInBlock = false;
+              isFirstInBlock = true;
             }
           } else {
             flagUserId = message.sender._id;
-
-            if (message.sender._id !== array[index + 1]?.sender._id) {
-              isInBlock = false;
-              isLastInBlock = true;
-            } else {
-              isInBlock = false;
-              isLastInBlock = false;
-              if (
-                array[index + 1]?.type !== MessageTypes.TEXT &&
-                array[index + 1]?.type !== MessageTypes.IMAGE
-              ) {
-                isInBlock = false;
-                isLastInBlock = true;
-              }
-            }
+            isFirstInBlock = true;
+            isInBlock = false;
           }
 
           const checkIsLastMessage = (i: number, arr: Message[]) => {
@@ -370,7 +325,7 @@ function ChatContent({ conversationId }: { conversationId: string }) {
           return (
             <HStack
               ref={index === 0 ? messageBoxRef : null}
-              key={message._id}
+              key={message._id + Math.random()}
               w="100%"
               justifyContent="center"
             >
@@ -378,7 +333,7 @@ function ChatContent({ conversationId }: { conversationId: string }) {
                 message={message}
                 isLastMessage={checkIsLastMessage(index, array)}
                 isInBlock={isInBlock}
-                isLastInBlock={isLastInBlock}
+                isFirstInBlock={isFirstInBlock}
               />
             </HStack>
           );
@@ -389,14 +344,12 @@ function ChatContent({ conversationId }: { conversationId: string }) {
       {isShowOverlay && (
         <HStack
           position="absolute"
-          // top="0"
           right="0"
           bottom="60px"
           w="100%"
           h="calc(100% - 60px)"
           justifyContent="center"
           alignItems="center"
-          // bgColor={bg}
           bgColor="transparent"
         >
           <Spinner />
@@ -434,22 +387,6 @@ function ChatContent({ conversationId }: { conversationId: string }) {
           </Button>
         </Tooltip>
 
-        <Input
-          display="none"
-          accept=".jpg, .png, .jpeg"
-          type="file"
-          name="image"
-          id="image"
-          ref={inputImageRef}
-          onChange={(e) => {
-            setImages((prev) => {
-              if (e.target.files && e.target.files[0]) {
-                return [...prev, e.target.files[0]];
-              } else return prev;
-            });
-          }}
-        />
-
         <Box
           flex="1"
           h={images.length === 0 ? "36px" : "116px"}
@@ -465,8 +402,8 @@ function ChatContent({ conversationId }: { conversationId: string }) {
             overflow="overlay"
             bgColor="transparent"
           >
-            <Button w="48px" h="48px" borderRadius="10px" bgColor="#e4e6ea">
-              <label htmlFor="image">
+            <Button w="48px" h="48px" borderRadius="10px">
+              <label htmlFor="images" style={{ cursor: "pointer" }}>
                 <CustomIcons.icon_add_image />
               </label>
             </Button>
@@ -504,30 +441,65 @@ function ChatContent({ conversationId }: { conversationId: string }) {
             />
           </HStack>
         </Box>
-        <Button
-          type="submit"
-          w="36px"
-          h="36px"
-          borderRadius="50%"
-          p="0"
-          bgColor="transparent"
-          fontSize="2rem"
-          opacity=".5"
+        <Tooltip
+          label="Attach file"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
         >
-          <RiAttachmentLine />
-        </Button>
-        <Button
-          type="submit"
-          w="36px"
-          h="36px"
-          borderRadius="50%"
-          p="0"
-          bgColor="transparent"
-          fontSize="2rem"
-          opacity=".5"
+          <Button
+            type="submit"
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            bgColor="transparent"
+            fontSize="2rem"
+            opacity=".5"
+            as="label"
+            htmlFor="images"
+            cursor="pointer"
+          >
+            <RiAttachmentLine />
+          </Button>
+        </Tooltip>
+        <Input
+          display="none"
+          accept=".jpg, .png, .jpeg"
+          type="file"
+          name="images"
+          id="images"
+          ref={inputImageRef}
+          onChange={(e) => {
+            setImages((prev) => {
+              if (e.target.files && e.target.files[0]) {
+                return [...prev, e.target.files[0]];
+              } else return prev;
+            });
+          }}
+        />
+
+        <Tooltip
+          label="Voice message"
+          fontSize="12px"
+          p="5px"
+          hasArrow
+          borderRadius="5px"
         >
-          <RiMicLine />
-        </Button>
+          <Button
+            type="submit"
+            w="36px"
+            h="36px"
+            borderRadius="50%"
+            p="0"
+            bgColor="transparent"
+            fontSize="2rem"
+            opacity=".5"
+          >
+            <RiMicLine />
+          </Button>
+        </Tooltip>
 
         <Button
           type="submit"

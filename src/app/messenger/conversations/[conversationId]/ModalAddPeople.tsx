@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Box,
+  Avatar,
   Button,
   Checkbox,
   HStack,
@@ -14,11 +14,16 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  VStack,
 } from "@chakra-ui/react";
+import { TiDelete } from "react-icons/ti";
+
 import CustomIcons from "~/app/components/Icon";
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import _ from "lodash";
 import requestApi from "~/utils/api";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function ModalAddPeople({
   conversationMembers,
@@ -26,12 +31,16 @@ function ModalAddPeople({
   onCloseModalAddPeople,
   conversationId,
 }: any) {
+  const [listSelected, setListSelected] = useState<any[]>([]);
+
   const listFriends = useUserInfo((state: UserInfoState) => state.friends);
   const canBeAddedToGroupUsers = _.differenceWith(
     listFriends,
     conversationMembers,
     (a: any, b: any) => a._id === b._id
   );
+
+  const pathName = usePathname();
 
   const handleSubmitAddPeople = async (e: any) => {
     e.preventDefault();
@@ -52,6 +61,10 @@ function ModalAddPeople({
     }
   };
 
+  useEffect(() => {
+    setListSelected([]);
+  }, [isOpenModalAddPeople]);
+
   return (
     <Modal isOpen={isOpenModalAddPeople} onClose={onCloseModalAddPeople}>
       <ModalOverlay />
@@ -60,8 +73,9 @@ function ModalAddPeople({
         maxH="572px"
         w="548px"
         h="572px"
-        mt="10vh"
+        mt="calc(50vh - 286px)"
         borderRadius="10px"
+        bgColor={pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""}
       >
         <ModalHeader
           fontSize="1.6rem"
@@ -84,7 +98,9 @@ function ModalAddPeople({
             as="form"
             h="36px"
             border="1px solid"
-            borderColor="#CED0D4"
+            borderColor={
+              pathName.split("/")[1] === "appchatcucmanh" ? "gray" : "#CED0D4"
+            }
             borderRadius="8px"
             p="0 8px"
           >
@@ -99,8 +115,41 @@ function ModalAddPeople({
               }}
             />
           </HStack>
-          <Box p="16px 16px 0" w="100%" h="120px" bgColor="#333"></Box>
-          <Box as="form" onSubmit={handleSubmitAddPeople}>
+          <HStack
+            p="16px 16px 0"
+            w="100%"
+            h="120px"
+            justifyContent={listSelected.length === 0 ? "center" : "flex-start"}
+            gap="20px"
+          >
+            {listSelected.length === 0 && (
+              <Text fontSize="1.2rem" fontWeight="300">
+                Chưa chọn người dùng nào
+              </Text>
+            )}
+            {listSelected.map((user) => {
+              return (
+                <VStack key={user._id} position="relative">
+                  <Avatar src={user.avatar} />
+                  <Text fontSize="1.2rem" fontWeight="300">
+                    {user.displayName}
+                  </Text>
+                  {/* <Button
+                    position="absolute"
+                    top="-10px"
+                    right="-5px"
+                    p="0"
+                    fontSize="1.6rem"
+                    borderRadius="50%"
+                    bgColor="transparent"
+                  >
+                    <TiDelete />
+                  </Button> */}
+                </VStack>
+              );
+            })}
+          </HStack>
+          <VStack as="form" onSubmit={handleSubmitAddPeople} h="330px">
             <Text>Gợi ý</Text>
             {canBeAddedToGroupUsers.map((user) => {
               return (
@@ -118,7 +167,7 @@ function ModalAddPeople({
                     src={
                       user.avatar
                         ? user.avatar
-                        : "https://scontent.fhan20-1.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=2b6aad&_nc_eui2=AeE-4fINDkTKpqp6AeNkaBwWso2H55p0AlGyjYfnmnQCUfpKyWf3qbpWB5GlYHhFJgjq-TbNpyj7ju6QXf36ElkA&_nc_ohc=OgbBqcsBbP8AX_9YNZ3&_nc_ht=scontent.fhan20-1.fna&oh=00_AfCcjusBrJFBUgXvN5BGR4d7_vuMDTjjMsaRcYUIbQaWDA&oe=65BF34F8"
+                        : "https://scontent.fhan14-5.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=YknWlsUwj4wAX9Xrcoh&_nc_ht=scontent.fhan14-5.fna&oh=00_AfDXmRAlUkJnACxAqR1G5BxGq7Zeaun_IC3chAlXLs0LWA&oe=6617F9F8"
                     }
                     alt="avt"
                     w="36px"
@@ -141,12 +190,37 @@ function ModalAddPeople({
                     id={user._id}
                     ml="auto"
                     size="lg"
+                    colorScheme={
+                      pathName.split("/")[1] === "appchatcucmanh"
+                        ? "green"
+                        : "blue"
+                    }
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setListSelected((prev) => {
+                          return [...prev, user];
+                        });
+                      } else {
+                        setListSelected((prev) => {
+                          return prev.filter((item) => item._id !== user._id);
+                        });
+                      }
+                    }}
                   />
                 </Button>
               );
             })}
-            <Button type="submit">Thêm người</Button>
-          </Box>
+            <Button
+              type="submit"
+              mt="auto"
+              colorScheme={
+                pathName.split("/")[1] === "appchatcucmanh" ? "green" : "gray"
+              }
+              fontSize="1.2rem"
+            >
+              Thêm người
+            </Button>
+          </VStack>
         </ModalBody>
       </ModalContent>
     </Modal>

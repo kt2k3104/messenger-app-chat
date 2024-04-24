@@ -1,17 +1,31 @@
 "use client";
 
-import { Avatar, Button, HStack, Input, Select, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Button,
+  HStack,
+  Input,
+  Select,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { RiNotification2Line } from "react-icons/ri";
 import { FaAngleDown } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 
 import useUserInfo, { UserInfoState } from "~/hooks/useUserInfo";
 import { useState } from "react";
+import ModalPerInfo from "~/app/components/ModalPerInfo";
 
 function Header() {
   const [isShowInputSearch, setIsShowInputSearch] = useState(false);
   const currUserInfo = useUserInfo((state: UserInfoState) => state.userInfo);
 
+  const {
+    isOpen: isOpenModalPerInfo,
+    onOpen: onOpenModalPerInfo,
+    onClose: onCloseModalPerInfo,
+  } = useDisclosure();
   return (
     <HStack w="100%" h="90px" justifyContent="space-between" p="16px 36px">
       <Text fontSize="2.4rem">Messages</Text>
@@ -68,11 +82,16 @@ function Header() {
           bgColor="transparent"
           border="1px solid rgba(225,225,225, 0.1)"
           gap="8px"
+          onClick={onOpenModalPerInfo}
         >
           <Avatar src={currUserInfo?.avatar} />
           <Text>{currUserInfo?.displayName}</Text>
           <FaAngleDown />
         </Button>
+        <ModalPerInfo
+          isOpenModalPerInfo={isOpenModalPerInfo}
+          onCloseModalPerInfo={onCloseModalPerInfo}
+        />
       </HStack>
     </HStack>
   );

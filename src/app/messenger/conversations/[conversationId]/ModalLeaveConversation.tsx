@@ -10,6 +10,7 @@ import {
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
+import { usePathname } from "next/navigation";
 import requestApi from "~/utils/api";
 
 function ModalLeaveConversation({
@@ -17,6 +18,8 @@ function ModalLeaveConversation({
   onCloseModalLeaveConversation,
   conversationId,
 }: any) {
+  const pathName = usePathname();
+
   return (
     <Modal
       isOpen={isOpenModalLeaveConversation}
@@ -30,6 +33,7 @@ function ModalLeaveConversation({
         h="165px"
         mt="39vh"
         borderRadius="10px"
+        bgColor={pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""}
       >
         <ModalHeader p="16px 60px">
           <Text fontSize="1.6rem" fontWeight="500" textAlign="center">
@@ -58,13 +62,11 @@ function ModalLeaveConversation({
             w="254px"
             h="36px"
             borderRadius="5px"
-            colorScheme="blue"
+            colorScheme="gray"
             fontSize="1.4rem"
             fontWeight="500"
             cursor="pointer"
-            bgColor="rgba(0, 0, 0, 0.04);"
             color="textPrimary.100"
-            _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
             onClick={onCloseModalLeaveConversation}
           >
             Hủy
@@ -75,7 +77,9 @@ function ModalLeaveConversation({
             w="254px"
             h="36px"
             borderRadius="5px"
-            colorScheme="blue"
+            colorScheme={
+              pathName.split("/")[1] === "appchatcucmanh" ? "green" : "blue"
+            }
             fontSize="1.4rem"
             fontWeight="500"
             cursor="pointer"

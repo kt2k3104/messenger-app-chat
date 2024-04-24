@@ -11,6 +11,7 @@ import {
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import requestApi from "~/utils/api";
 
@@ -21,6 +22,9 @@ function ModalRenameConversation({
   conversationName,
 }: any) {
   const [name, setName] = useState(conversationName);
+
+  const pathName = usePathname();
+
   const handleSubmitRenameConversation = async (e: any) => {
     e.preventDefault();
     try {
@@ -45,6 +49,7 @@ function ModalRenameConversation({
         h="223px"
         mt="39vh"
         borderRadius="10px"
+        bgColor={pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""}
       >
         <ModalHeader>
           <Text fontSize="1.6rem" fontWeight="400" textAlign="center">
@@ -84,13 +89,11 @@ function ModalRenameConversation({
               w="254px"
               h="36px"
               borderRadius="5px"
-              colorScheme="blue"
+              colorScheme="gray"
               fontSize="1.4rem"
               fontWeight="500"
               cursor="pointer"
-              bgColor="rgba(0, 0, 0, 0.04);"
               color="textPrimary.100"
-              _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
               onClick={onCloseModalRenameConversation}
             >
               Hủy
@@ -101,14 +104,14 @@ function ModalRenameConversation({
               w="254px"
               h="36px"
               borderRadius="5px"
-              colorScheme="blue"
+              colorScheme={
+                pathName.split("/")[1] === "appchatcucmanh" ? "green" : "blue"
+              }
               fontSize="1.4rem"
               fontWeight="500"
               cursor={name ? "pointer" : "not-allowed"}
               opacity={name ? 1 : 0.5}
-              bgColor="rgba(0, 0, 0, 0.04);"
               color="textPrimary.100"
-              _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
             >
               Lưu
             </Button>

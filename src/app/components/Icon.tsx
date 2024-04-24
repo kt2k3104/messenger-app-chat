@@ -162,7 +162,7 @@ function IconSearch() {
     </svg>
   );
 }
-function IconSearchMessage() {
+function IconSearchMessage({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -171,8 +171,7 @@ function IconSearchMessage() {
       height="20"
       className="x19dipnz x1lliihq"
       overflow="visible"
-      // style={{ color: "var(--mwp-header-button-color)" }}
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path
         fillRule="evenodd"
@@ -284,28 +283,28 @@ function IconFb() {
     </svg>
   );
 }
-function IconNoti() {
+function IconNoti({ color = "#fff" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
       fill="currentColor"
-      width="20"
-      height="20"
+      width="16"
+      height="16"
       className="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq"
       overflow="visible"
-      // style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M18 7a6.569 6.569 0 0 1 6.467 5.414l1.367 7.658a3 3 0 0 0 .832 1.594l.92.92a1.414 1.414 0 0 1-1 2.414H9.414a1.414 1.414 0 0 1-1-2.414l.92-.92a3 3 0 0 0 .832-1.594l1.367-7.658A6.569 6.569 0 0 1 18 7zM15.5 27c-.276 0-.504.226-.459.498a3 3 0 0 0 5.918 0c.045-.273-.183-.498-.459-.498h-5z"></path>
     </svg>
   );
 }
-function IconTopic() {
+function IconTopic({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 20 20"
       className="x1lliihq x1k90msu x2h7rmj x1qfuztq"
       // fill="url(#:rtq:)"
-      fill="var(--primary-icon)"
+      fill={color}
       height="24"
       width="24"
     >
@@ -325,7 +324,7 @@ function IconTopic() {
     </svg>
   );
 }
-function IconChangeEmoticon() {
+function IconChangeEmoticon({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -335,13 +334,13 @@ function IconChangeEmoticon() {
       className="x19dipnz x1lliihq"
       overflow="visible"
       // style={{ color: "#0a7cff" }}
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M17.987 6c1.104 0 3.67.726 3.67 5.149 0 1.232-.123 2.001-.209 2.534-.018.115-.035.219-.048.314l-.001.005a.36.36 0 0 0 .362.406c4.399 0 6.748 1.164 6.748 2.353 0 .533-.2 1.02-.527 1.395a.11.11 0 0 0 .023.163 2.13 2.13 0 0 1 .992 1.79c0 .86-.477 1.598-1.215 1.943a.11.11 0 0 0-.046.157c.207.328.329.713.329 1.128 0 .946-.547 1.741-1.406 2.029a.109.109 0 0 0-.068.137c.061.184.098.38.098.584 0 1.056-1.776 1.913-5.95 1.913-3.05 0-5.154-.545-5.963-.936-.595-.288-1.276-.81-1.276-2.34v-6.086c0-1.72.958-2.87 1.911-4.014.946-1.135 1.888-2.265 1.888-3.943 0-1.34-.091-2.19-.159-2.817-.039-.368-.07-.66-.07-.928 0-.527.385-.934.917-.936zM10.5 17h-2c-1 0-1.5 2.686-1.5 6s.5 6 1.5 6h2a1 1 0 0 0 1-1V18a1 1 0 0 0-1-1z"></path>
     </svg>
   );
 }
-function IconChangeNickname() {
+function IconChangeNickname({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 36 36"
@@ -350,7 +349,7 @@ function IconChangeNickname() {
       height="24"
       width="24"
       // style={{ color: "var(--always-black)" }}
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path
         clipRule="evenodd"
@@ -360,7 +359,7 @@ function IconChangeNickname() {
     </svg>
   );
 }
-function IconMediaFiles() {
+function IconMediaFiles({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 36 36"
@@ -369,7 +368,7 @@ function IconMediaFiles() {
       height="24"
       width="24"
       // style={{ color: "var(--always-black)" }}
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M17.5 19.75a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
       <path
@@ -379,7 +378,7 @@ function IconMediaFiles() {
     </svg>
   );
 }
-function IconFile() {
+function IconFile({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 36 36"
@@ -388,7 +387,7 @@ function IconFile() {
       height="24"
       width="24"
       // style={{ color: "var(--always-black)" }}
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path
         d="M18 8a1 1 0 00-1-1h-6a2 2 0 00-2 2v18a2 2 0 002 2h14a2 2 0 002-2V17a1 1 0 00-1-1h-4a4 4 0 01-4-4V8zm-6 7a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zm1 3.5a1 1 0 100 2h10a1 1 0 100-2H13zm0 4.5a1 1 0 100 2h10a1 1 0 100-2H13z"
@@ -406,7 +405,6 @@ function IconTemporaryMessage() {
       fill="currentColor"
       height="24"
       width="24"
-      // style={{ color: "var(--always-black)" }}
       // style={{ color: "var(--primary-icon)" }}
     >
       <path
@@ -483,15 +481,14 @@ function IconSendImage() {
 function IconAddImage() {
   return (
     <i
-      data-visualcompletion="css-img"
-      className="x1b0d499 xep6ejk"
       style={{
-        backgroundImage: `url("https://static.xx.fbcdn.net/rsrc.php/v3/yf/r/5-ETpamKGnz.png?_nc_eui2=AeFsID5BEehGOpvLNcKc6tklSFzIAIVT4W9IXMgAhVPhbzcQDfQh26AhLG_5iMSgrgGFDlSc49xySwYs3xzBiB2F") `,
-        backgroundPosition: "-188px -546px ",
-        backgroundSize: "248px 668px ",
+        backgroundImage:
+          'url("https://static.xx.fbcdn.net/rsrc.php/v3/y6/r/xGm_TLoZbLk.png")',
+        backgroundPosition: "-78px -650px",
+        backgroundSize: "248px 778px",
         width: "24px",
-        height: "24px ",
-        backgroundRepeat: "no-repeat ",
+        height: "24px",
+        backgroundRepeat: "no-repeat",
         display: "inline-block",
       }}
     ></i>
@@ -514,7 +511,7 @@ function IconFriendRequest() {
     ></i>
   );
 }
-function IconPinnedMessage() {
+function IconPinnedMessage({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -523,7 +520,7 @@ function IconPinnedMessage() {
       height="16"
       className="x19dipnz x1lliihq"
       overflow="visible"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path
         fillRule="evenodd"
@@ -533,7 +530,7 @@ function IconPinnedMessage() {
     </svg>
   );
 }
-function IconChangeNameConversation() {
+function IconChangeNameConversation({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -542,13 +539,13 @@ function IconChangeNameConversation() {
       height="16"
       className="x19dipnz x1lliihq"
       overflow="visible"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M20.953 12.569a.75.75 0 0 0-1.06 0l-8.938 8.937a4.004 4.004 0 0 0-.715.973l-2.121 4.05c-.455.867.481 1.804 1.35 1.349l4.049-2.121c.358-.188.686-.429.972-.715l8.938-8.937a.75.75 0 0 0 0-1.061l-2.475-2.475zM24.842 13.63a.75.75 0 0 0 1.06 0l1.363-1.362a2.5 2.5 0 0 0-3.536-3.536l-1.362 1.362a.75.75 0 0 0 0 1.06l2.475 2.476z"></path>
     </svg>
   );
 }
-function IconChangeAvatarConversation() {
+function IconChangeAvatarConversation({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -557,7 +554,7 @@ function IconChangeAvatarConversation() {
       height="16"
       className="x19dipnz x1lliihq"
       overflow="visible"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M13.5 16.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
       <path
@@ -568,7 +565,7 @@ function IconChangeAvatarConversation() {
     </svg>
   );
 }
-function IconSearchInConversation() {
+function IconSearchInConversation({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="6 6 24 24"
@@ -577,7 +574,7 @@ function IconSearchInConversation() {
       height="16"
       className="x19dipnz x1lliihq"
       overflow="visible"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path
         fillRule="evenodd"
@@ -587,7 +584,7 @@ function IconSearchInConversation() {
     </svg>
   );
 }
-function IconLink() {
+function IconLink({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 36 36"
@@ -595,14 +592,14 @@ function IconLink() {
       fill="currentColor"
       height="24"
       width="24"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M21.996 19.317c-1.405 1.406-3.747 1.408-5.23-.075a1.25 1.25 0 00-1.768 1.768c2.423 2.424 6.349 2.494 8.767.076l3.46-3.461c2.419-2.418 2.35-6.344-.075-8.767-2.423-2.424-6.348-2.494-8.766-.076l-.557.557a1.25 1.25 0 001.769 1.768l.556-.556c1.406-1.406 3.747-1.408 5.23.075 1.483 1.483 1.48 3.825.075 5.23l-3.46 3.461z"></path>
       <path d="M14.012 16.69c1.406-1.405 3.747-1.407 5.23.076a1.25 1.25 0 001.768-1.768c-2.423-2.424-6.348-2.493-8.766-.076l-3.462 3.462c-2.418 2.418-2.348 6.343.076 8.766 2.423 2.424 6.349 2.494 8.767.076l.556-.557a1.25 1.25 0 00-1.768-1.768l-.557.556c-1.405 1.406-3.747 1.408-5.23-.075-1.483-1.483-1.48-3.824-.075-5.23l3.461-3.461z"></path>
     </svg>
   );
 }
-function IconLeaveConversation() {
+function IconLeaveConversation({ color = "var(--primary-icon)" }: any) {
   return (
     <svg
       viewBox="0 0 36 36"
@@ -610,7 +607,7 @@ function IconLeaveConversation() {
       fill="currentColor"
       height="24"
       width="24"
-      style={{ color: "var(--primary-icon)" }}
+      style={{ color: color }}
     >
       <path d="M21.498 14.75a1 1 0 001-1V12a4 4 0 00-4-4h-6.5a4 4 0 00-4 4v12a4 4 0 004 4h6.5a4 4 0 004-4v-1.75a1 1 0 00-1-1h-.5a1 1 0 00-1 1V24a1.5 1.5 0 01-1.5 1.5h-6.5a1.5 1.5 0 01-1.5-1.5V12a1.5 1.5 0 011.5-1.5h6.5a1.5 1.5 0 011.5 1.5v1.75a1 1 0 001 1h.5z"></path>
       <path d="M14.498 16.75h9.752a.25.25 0 00.25-.25v-1.858a1 1 0 011.642-.766l4.002 3.356a1 1 0 010 1.532l-4.002 3.357a1 1 0 01-1.642-.767V19.5a.25.25 0 00-.25-.25h-9.752a1 1 0 01-1-1v-.5a1 1 0 011-1z"></path>

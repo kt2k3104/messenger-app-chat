@@ -345,7 +345,7 @@ function ChatContent({ conversationId }: { conversationId: any }) {
           return (
             <HStack
               ref={index === 0 ? messageBoxRef : null}
-              key={message._id}
+              key={message._id + Math.random()}
               w="100%"
               justifyContent="center"
             >

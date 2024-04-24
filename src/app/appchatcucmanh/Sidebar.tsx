@@ -8,6 +8,7 @@ import {
   Icon,
   Text,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { RiHome5Line } from "react-icons/ri";
@@ -21,11 +22,13 @@ import { GiBackwardTime } from "react-icons/gi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { FaRegUserCircle } from "react-icons/fa";
 import { BiLogOutCircle } from "react-icons/bi";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useConversations, { ConversationsState } from "~/hooks/useConversations";
 import useLogic, { LogicState } from "~/hooks/useLogic";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Conversation } from "~/hooks/useUserInfo";
+import { is } from "date-fns/locale";
+import AlertLogout from "../components/AlertLogout";
 
 function SideBar() {
   const conversations = useConversations(
@@ -35,17 +38,25 @@ function SideBar() {
     (state: LogicState) => state.notSeenMessages
   );
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const bg = useColorModeValue("#e5e5e5", "#212427");
   const pathName = usePathname();
 
   return (
-    <Box w="260px" h="100%" borderRadius="20px" bgColor={bg}>
+    <Box
+      w={{ base: "60px", lg: "200px", xl: "240px" }}
+      h="100%"
+      borderRadius="20px"
+      bgColor={bg}
+      flexShrink={0}
+    >
       <HStack
         w="100%"
         h="90px"
-        justifyContent="flex-start"
         alignItems="center"
-        ml="42px"
+        justifyContent={{ base: "center", lg: "flex-start" }}
+        ml={{ base: "0", lg: "28px", xl: "42px" }}
         gap="10px"
       >
         <svg
@@ -71,7 +82,11 @@ function SideBar() {
             <circle cx="24" cy="30" r="2" />
           </g>
         </svg>
-        <Text fontSize="2.4rem" fontWeight="700">
+        <Text
+          display={{ base: "none", lg: "block" }}
+          fontSize="2.4rem"
+          fontWeight="700"
+        >
           Chatchit
         </Text>
       </HStack>
@@ -81,8 +96,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/").length < 3
@@ -98,10 +113,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/").length < 3 ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <RiHome5Line />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/").length < 3 ? 1 : 0.5}
@@ -110,7 +127,10 @@ function SideBar() {
             Home
           </Text>
           <Icon
-            display={pathName.split("/").length < 3 ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/").length < 3 ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -124,8 +144,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "contacts"
@@ -141,10 +161,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "contacts" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <RiContactsBookUploadLine />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "contacts" ? 1 : 0.5}
@@ -153,7 +175,10 @@ function SideBar() {
             Contacts
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "contacts" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "contacts" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -167,8 +192,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "myteam"
@@ -184,10 +209,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "myteam" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <AiOutlineTeam />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "myteam" ? 1 : 0.5}
@@ -196,7 +223,10 @@ function SideBar() {
             My Team
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "myteam" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "myteam" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -216,8 +246,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "messages"
@@ -233,10 +263,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "messages" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <BiMessageSquareDots />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "messages" ? 1 : 0.5}
@@ -245,7 +277,10 @@ function SideBar() {
             Messages
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "messages" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "messages" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -259,8 +294,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "tasks"
@@ -276,10 +311,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "tasks" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <RiTaskLine />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "tasks" ? 1 : 0.5}
@@ -288,7 +325,10 @@ function SideBar() {
             Tasks
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "tasks" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "tasks" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -302,8 +342,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "calendar"
@@ -319,10 +359,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "calendar" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <LuCalendar />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "calendar" ? 1 : 0.5}
@@ -331,7 +373,10 @@ function SideBar() {
             Calendar
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "calendar" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "calendar" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -345,8 +390,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "activity"
@@ -362,10 +407,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "activity" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <GiBackwardTime />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "activity" ? 1 : 0.5}
@@ -374,7 +421,10 @@ function SideBar() {
             Activity
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "activity" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "activity" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -388,8 +438,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "reports"
@@ -405,10 +455,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "reports" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <TbReportAnalytics />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "reports" ? 1 : 0.5}
@@ -417,7 +469,10 @@ function SideBar() {
             Reports
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "reports" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "reports" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -434,8 +489,8 @@ function SideBar() {
           w="100%"
           height="44px"
           fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
+          justifyContent={{ base: "center", lg: "flex-start" }}
+          pl={{ base: "0", lg: "42px" }}
           bgColor="transparent"
           bgImage={
             pathName.split("/")[2] === "myprofile"
@@ -453,10 +508,12 @@ function SideBar() {
           <Box
             opacity={pathName.split("/")[2] === "myprofile" ? 1 : 0.5}
             _groupHover={{ opacity: 1 }}
+            fontSize={{ base: "2.4rem", lg: "1.4rem" }}
           >
             <FaRegUserCircle />
           </Box>
           <Text
+            display={{ base: "none", lg: "block" }}
             ml="10px"
             textTransform="none"
             opacity={pathName.split("/")[2] === "myprofile" ? 1 : 0.5}
@@ -465,7 +522,10 @@ function SideBar() {
             My Profile
           </Text>
           <Icon
-            display={pathName.split("/")[2] === "myprofile" ? "block" : "none"}
+            display={{
+              base: "none",
+              lg: pathName.split("/")[2] === "myprofile" ? "block" : "none",
+            }}
             as={GoDotFill}
             color="#53aa91"
             ml="auto"
@@ -473,31 +533,37 @@ function SideBar() {
           />
         </Avatar>
       </Link>
-      <Link href={""}>
-        <Avatar
-          icon={<></>}
-          w="100%"
-          height="44px"
-          fontSize="1.4rem"
-          justifyContent="flex-start"
-          pl="42px"
-          bgColor="transparent"
-          borderRadius="0"
-          role="group"
+      <Avatar
+        icon={<></>}
+        w="100%"
+        height="44px"
+        fontSize="1.4rem"
+        justifyContent={{ base: "center", lg: "flex-start" }}
+        pl={{ base: "0", lg: "42px" }}
+        bgColor="transparent"
+        borderRadius="0"
+        role="group"
+        cursor="pointer"
+        onClick={onOpen}
+      >
+        <Box
+          opacity={0.5}
+          _groupHover={{ opacity: 1 }}
+          fontSize={{ base: "2.4rem", lg: "1.4rem" }}
         >
-          <Box opacity={0.5} _groupHover={{ opacity: 1 }}>
-            <BiLogOutCircle />
-          </Box>
-          <Text
-            ml="10px"
-            textTransform="none"
-            opacity={0.5}
-            _groupHover={{ opacity: 1 }}
-          >
-            Log out
-          </Text>
-        </Avatar>
-      </Link>
+          <BiLogOutCircle />
+        </Box>
+        <Text
+          display={{ base: "none", lg: "block" }}
+          ml="10px"
+          textTransform="none"
+          opacity={0.5}
+          _groupHover={{ opacity: 1 }}
+        >
+          Log out
+        </Text>
+      </Avatar>
+      <AlertLogout isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }

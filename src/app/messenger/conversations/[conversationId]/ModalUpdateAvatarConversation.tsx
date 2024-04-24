@@ -12,6 +12,7 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import requestApi from "~/utils/api";
 
@@ -22,6 +23,8 @@ function ModalUpdateAvatarConversation({
 }: any) {
   const [image, setImage] = useState<any>(null);
   const [spinner, setSpinner] = useState<boolean>(false);
+
+  const pathName = usePathname();
 
   const handleSubmitUpdateAvatarConversation = async (e: any) => {
     e.preventDefault();
@@ -53,6 +56,7 @@ function ModalUpdateAvatarConversation({
         h="140px"
         mt="39vh"
         borderRadius="10px"
+        bgColor={pathName.split("/")[1] === "appchatcucmanh" ? "#212427" : ""}
       >
         <ModalHeader>
           <Text fontSize="1.6rem" fontWeight="400" textAlign="center">
@@ -93,10 +97,10 @@ function ModalUpdateAvatarConversation({
                 h="36px"
                 fontSize="1.4rem"
                 fontWeight="500"
-                colorScheme="blue"
-                bgColor="rgba(0, 0, 0, 0.04);"
+                colorScheme={
+                  pathName.split("/")[1] === "appchatcucmanh" ? "green" : "gray"
+                }
                 color="textPrimary.100"
-                _hover={{ bgColor: "rgba(0,0,0,0.08)" }}
               >
                 Cập nhật
               </Button>

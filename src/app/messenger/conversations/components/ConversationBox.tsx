@@ -47,7 +47,6 @@ export const convertTime = (created_at: string) => {
 };
 
 function ConversationBox({ conversation }: { conversation: Conversation }) {
-  console.log(conversation.messages.length);
   const setCurrConversation = useConversations(
     (state: ConversationsState) => state.setCurrConversation
   );
